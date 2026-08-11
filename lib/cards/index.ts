@@ -31,8 +31,13 @@ export { buildRepoCard } from "./repo";
  * a carta quebraria ao renderizar, não ao compilar. Em desenvolvimento o cache é
  * em memória e some no restart, então isso passaria despercebido até produção,
  * onde o Redis guarda por uma hora.
+ *
+ * v4: carta de repositório passou a trazer `derivations`. Ao contrário das duas
+ * anteriores, esta não quebra nada — carta v3 em cache só sai sem o painel de
+ * explicação. Subiu mesmo assim porque uma hora de repositório sem as laterais
+ * seria indistinguível do bug que este trabalho fecha.
  */
-const CARD_VERSION = "v3";
+const CARD_VERSION = "v4";
 
 const LOGIN = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 const REPO_NAME = /^[a-zA-Z0-9._-]{1,100}$/;

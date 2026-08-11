@@ -123,6 +123,31 @@ const pt = {
   "why.retreat": "Conta com {years} anos: 1 pip a cada 2 anos, teto de 4.",
   "why.rarity": "{score} pontos — estrelas ×2 + seguidores ×3 + repositórios + anos ×5.",
 
+  /*
+   * Frases da carta de repositório. Separadas das de perfil porque lá o sujeito
+   * é quem está lendo ("sua linguagem dominante") e aqui é o repositório.
+   */
+  "why.repo.element": "A linguagem principal do repositório é {language}.",
+  "why.repo.element.none": "O GitHub não reporta linguagem principal para este repositório.",
+  "why.repo.element.unmapped":
+    "{language} não está no mapa de tipos, então a carta cai no tipo padrão.",
+  "why.repo.hp":
+    "Base 40, em escala logarítmica sobre {stars} estrelas e {forks} forks — teto de 250.",
+  "why.repo.attacks": "Maiores contribuidores humanos: {names}.",
+  "why.repo.attacks.self":
+    "Nenhum contribuidor humano listado — o próprio repositório vira o ataque.",
+  "why.repo.weakness": "Fraqueza padrão do tipo, pela cadeia de efetividade.",
+  "why.repo.weakness.none": "Este tipo não tem fraqueza na cadeia.",
+  "why.repo.resistance": "Resistência padrão do tipo, pela cadeia de efetividade.",
+  "why.repo.resistance.none": "Este tipo não resiste a nenhum outro na cadeia.",
+  "why.repo.retreat": "{issues} issues abertas: 1 pip a cada 50, teto de 4.",
+  "why.repo.rarity":
+    "{score} pontos — {stars} estrelas ×2 + {forks} forks ×3 + {bonus} por atividade recente.",
+  "why.repo.rarity.stale":
+    "{score} pontos — {stars} estrelas ×2 + {forks} forks ×3, sem bônus: o último push passou de 90 dias.",
+  "why.repo.rarity.archived":
+    "{score} pontos — {stars} estrelas ×2 + {forks} forks ×3. Repositório arquivado não recebe bônus de atividade.",
+
   "pack.label": "Abrindo o pacote de {name}",
   "pack.brand": "PACOTE DE EXPANSÃO",
   "pack.tear": "Rasgar",
@@ -241,6 +266,27 @@ const en: Record<MessageKey, string> = {
   "why.resistance.none": "The weakness landed on the same type as the resistance; weakness wins.",
   "why.retreat": "Account is {years} years old: 1 pip every 2 years, capped at 4.",
   "why.rarity": "{score} points — stars ×2 + followers ×3 + repositories + years ×5.",
+
+  "why.repo.element": "The repository's main language is {language}.",
+  "why.repo.element.none": "GitHub reports no main language for this repository.",
+  "why.repo.element.unmapped":
+    "{language} is not in the type map, so the card falls back to the default type.",
+  "why.repo.hp":
+    "Base 40, on a logarithmic scale over {stars} stars and {forks} forks — capped at 250.",
+  "why.repo.attacks": "Top human contributors: {names}.",
+  "why.repo.attacks.self":
+    "No human contributor listed — the repository itself becomes the attack.",
+  "why.repo.weakness": "Default weakness of the type, from the effectiveness chain.",
+  "why.repo.weakness.none": "This type has no weakness in the chain.",
+  "why.repo.resistance": "Default resistance of the type, from the effectiveness chain.",
+  "why.repo.resistance.none": "This type resists no other type in the chain.",
+  "why.repo.retreat": "{issues} open issues: 1 pip every 50, capped at 4.",
+  "why.repo.rarity":
+    "{score} points — {stars} stars ×2 + {forks} forks ×3 + {bonus} for recent activity.",
+  "why.repo.rarity.stale":
+    "{score} points — {stars} stars ×2 + {forks} forks ×3, no bonus: last push is over 90 days old.",
+  "why.repo.rarity.archived":
+    "{score} points — {stars} stars ×2 + {forks} forks ×3. An archived repository earns no activity bonus.",
 
   "pack.label": "Opening {name}'s pack",
   "pack.brand": "EXPANSION PACK",
