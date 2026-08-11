@@ -1,0 +1,37 @@
+{
+  "name": "gitmon-cards",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gerador de cartas estilo TCG a partir de dados reais do GitHub.",
+  "license": "MIT",
+  "author": "Matheus Scalabrin",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "assets": "node scripts/build-assets.mjs"
+  },
+  "dependencies": {
+    "ioredis": "^6.0.0",
+    "next": "^16.3.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

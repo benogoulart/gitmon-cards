@@ -1,0 +1,81 @@
+/*
+ * Identidade visual do produto. Autônoma — não herda a paleta pessoal do autor
+ * (RFC 9.3). A paleta das cartas é outra coisa: vive em lib/cards/elements.ts e
+ * segue os 7 elementos.
+ */
+
+:root {
+  --bg: #0d0f14;
+  --bg-raised: #161a22;
+  --bg-sunken: #090b0f;
+  --border: #262c38;
+  --border-strong: #39414f;
+
+  --text: #e8eaee;
+  --text-muted: #949cab;
+  --text-faint: #5f6775;
+
+  --accent: #f2c94c;
+  --accent-ink: #2a2109;
+
+  --danger: #e2622f;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --radius: 10px;
+  --radius-lg: 18px;
+
+  --shell: 1080px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Respeita quem pediu menos movimento — a animação de revelação é enfeite. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
