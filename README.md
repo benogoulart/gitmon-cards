@@ -187,6 +187,92 @@ A RFC é a fonte de verdade declarada. Onde uma decisão posterior a substituiu,
 fica no lugar com um **adendo de supersessão** logo abaixo — o histórico da decisão vale tanto
 quanto a decisão.
 
+## Contribuindo
+
+Issues e PRs são bem-vindos. O projeto é pequeno e opinativo — esta seção existe para que uma
+contribuição não esbarre em regra não escrita.
+
+### Antes de abrir o PR
+
+```bash
+npm run typecheck
+npm test
+npm run test:e2e
+```
+
+**Não há CI.** `.github/workflows/` está vazio de propósito enquanto o projeto não é publicado, o
+que significa que esses três comandos são a única rede — se você não rodar, ninguém roda. E ignore
+`npm run lint`: ele está quebrado e o projeto não tem lint (ver acima).
+
+### Renderize e olhe
+
+A regra mais cara aprendida aqui: **o que quebra em layout só quebra olhando.** Já passaram por
+typecheck e suíte verde o dano do ataque sumindo da carta, o título duplicado, a coluna direita
+vazando da viewport e o alvo de clique que nunca assentava. Nenhum foi pego por teste; todos por
+screenshot.
+
+Se o PR mexe na carta, rode `PREVIEW=<dir> npm test` e olhe os PNGs. Se mexe na página, suba o
+`npm run dev` e olhe. Descreva no PR o que você viu.
+
+Dois avisos que economizam uma hora de depuração:
+
+- **O cache mascara mudança de domínio.** Em desenvolvimento o cache de cartas é em memória e
+  sobrevive ao hot reload. Toda vez que uma mudança no domínio "não apareceu", a causa foi essa —
+  reinicie o servidor.
+- **Há um terceiro cache: o navegador.** A rota de imagem responde `max-age=3600`, então o PNG na
+  tela pode ser de uma hora atrás enquanto o HTML ao redor já é novo. Se a página e a carta
+  discordarem, recarregue o PNG com `?bust=<agora>` antes de suspeitar do domínio.
+
+### Regras do domínio
+
+- **Mudou o formato da carta, sobe `CARD_VERSION`** (`lib/cards/index.ts`). Campo novo, ou valor
+  de enum que deixou de existir: sem a subida, uma carta velha em cache quebra ao renderizar, não
+  ao compilar — e em desenvolvimento isso passa despercebido até produção.
+- **As fórmulas são travadas na RFC**, não preferência de quem está editando. Mexer num peso de
+  `profile.ts` ou `repo.ts` exige atualizar a RFC 6.1/6.2 no mesmo PR, com o motivo.
+- **A imagem exportada é limpa (RFC 9.6).** Explicação, radar e afordância de navegação vivem só
+  no site. É por isso que `derivations` e `ratings` são opcionais no domínio: o renderizador de
+  imagem nunca os lê. Um PR que os fizer serem lidos derruba a promessa junto.
+- **Tom técnico-neutro (RFC 9.2).** O dado fala por si. Nomes de ataque são nomes de repositório
+  ou logins reais; o rodapé é template a partir dos números. Sem piada, sem humanização, sem
+  flavor text inventado no estilo TCG.
+- **`layout.json` e `palette.json` são fonte única**, lidas pelo build e pelo runtime. Duplicar um
+  valor deles em CSS ou em componente é o tipo de divergência que só aparece meses depois.
+
+### i18n
+
+`MessageKey` é derivado do dicionário `pt`, e `en` é tipado como `Record<MessageKey, string>`.
+Adicionar uma chave só em português **quebra o typecheck**, de propósito — não existe caminho para
+o site sair meio traduzido.
+
+Chaves com sujeito diferente ganham prefixo próprio em vez de reuso: `why.*` fala com a pessoa
+("sua linguagem dominante"), `why.repo.*` fala do repositório. Reusar economizaria linha e faria o
+site tratar um repositório por você.
+
+### Arte
+
+Toda moldura, ícone de tipo e ícone de energia é original. **Nenhum asset da Pokémon Company,
+nenhum ícone de fã** dos repositórios de referência — nem como placeholder temporário. As
+molduras, o foil e os metais são gerados por `npm run assets`; os 18 ícones de tipo são entrada de
+build em `scripts/assets/types/`, e a paleta de `palette.json` é extraída deles, não o contrário.
+
+### Commits
+
+Prefixo, minúsculas, sem acento no assunto: `feat:`, `docs:`, `chore:`. O corpo é onde mora o
+valor — explique **por que**, não o que o diff já mostra. Restrição descoberta, alternativa
+descartada e armadilha encontrada valem mais que um resumo das linhas alteradas.
+
+A RFC não se reescreve. Onde uma decisão posterior a substitui, a seção original fica no lugar com
+um adendo de supersessão logo abaixo, e a decisão nova entra em `docs/decisions.md`.
+
+Documentação, comentários e nomes de teste são em português. A API do código — tipos, funções
+exportadas, chaves de i18n — é em inglês.
+
+### Nunca commite
+
+`.env.local` (está no `.gitignore`, e o `.env.example` documenta as variáveis sem valores).
+Tokens do GitHub em teste, fixture ou mensagem de commit.
+
 ## Direitos autorais
 
 Nenhum asset da Pokémon Company, nenhum ícone de fã dos repositórios de referência.
