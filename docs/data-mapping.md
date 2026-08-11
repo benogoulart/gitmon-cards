@@ -48,8 +48,17 @@ Proposta inicial:
 | Arte | `owner.avatar_url` ou social preview do repo, se exposto pela API |
 
 Pontos a resolver: contribuidores custam uma chamada a mais por carta (impacto no rate limit e no
-cache); "fraqueza a manutenção" não é um dos 7 elementos, então ou vira um elemento existente ou
+cache); "fraqueza a manutenção" não é um dos elementos, então ou vira um elemento existente ou
 quebra o modelo de tipos.
+
+**Resolvido (Q5).** `open_issues_count` virou **custo de recuo**, não fraqueza:
+1 pip a cada 50 issues, teto de 4. Carrega a mesma leitura — repo com fila grande
+é mais difícil de largar — sem inventar um tipo fora da tabela. A fraqueza da
+carta de repositório vem da cadeia do tipo, como todo o resto.
+
+**Nota sobre a contagem de tipos.** Este documento foi escrito quando eram 7
+elementos. São **18**, e `neutral` virou `normal` — ver o adendo na seção 4.4 da
+RFC. Onde se lê `neutral` abaixo, leia `normal`.
 
 ## Casos de borda
 
@@ -57,8 +66,8 @@ quebra o modelo de tipos.
 |---|---|
 | Usuário inexistente | Erro claro, tom técnico-neutro (RFC 9.2) |
 | `type: Organization` | **Fora da v1** — detectar e devolver erro explícito, não gerar carta degradada (RFC 9.5) |
-| Perfil sem repositórios | Carta válida com tipo `neutral` e sem ataques — definir fallback |
-| Perfil sem linguagem detectável | `neutral` |
+| Perfil sem repositórios | Carta válida com tipo `normal` e sem ataques — definir fallback |
+| Perfil sem linguagem detectável | `normal` |
 | Rate limit atingido | Erro explícito; cache Redis é obrigatório, não opcional (RFC 11) |
 
 ## Motor de batalha

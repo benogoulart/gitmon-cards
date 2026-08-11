@@ -15,8 +15,9 @@ abre quando as pendências fecharem.
 | `a2996dc` | 18 tipos, escada de raridade do TCG, serial, tratamentos de arte, painel de explicação, abertura de pacote, faixa de apoio |
 | `7e2516d` | Radar de assinatura do perfil |
 | `9d79276` | Arranjo simétrico da página da carta |
+| (a seguir) | Derivações da carta de repositório, ícones de tipo na interface, RFCs conciliadas com os 18 tipos |
 
-Verificado no último commit: **97 testes unitários, 13 e2e, typecheck e build
+Verificado no último commit: **103 testes unitários, 13 e2e, typecheck e build
 limpos**.
 
 `.claude/` está **deliberadamente fora dos commits** — contém só o skill file do
@@ -82,14 +83,30 @@ Créditos gastos: ~60,5.
    mesmo fato. Para valer como sinal, precisa medir outra dimensão, tipo
    concentração do perfil (250k estrelas num repo vs. espalhadas em quarenta).
 
-## Próximo trabalho, já decidido
+## Próximo trabalho, já decidido — FEITO
 
-- **Derivações para cartas de repositório.** Hoje só perfil tem, então numa carta
-  de repo as duas colunas laterais ficam vazias e sobra só a carta ao centro.
-- **Ícones de tipo na interface.** Os 18 SVGs já são copiados para
-  `public/assets/types/` pelo build, mas a web ainda não os usa.
-- **RFCs que ainda falam em 7 elementos.** A raridade já ganhou adendo de
-  supersessão; os tipos ainda não.
+Os três itens desta lista foram fechados. O que ficou registrado de cada um:
+
+- **Derivações para cartas de repositório.** Sete linhas em `why.repo.*`, com
+  chaves próprias e não reusadas do perfil: as do perfil falam na segunda pessoa
+  ("sua linguagem dominante") e aqui o sujeito é o repositório. Três variantes
+  onde uma frase só mentiria — linguagem ausente × linguagem fora do mapa de
+  tipos (as duas dão `normal`), e repositório parado × arquivado (os dois dão
+  score sem bônus). `attacksFrom` passou a devolver uma bandeira
+  `fromContributors` em vez de a derivação adivinhar pelo nome do ataque.
+- **Ícones de tipo na interface.** `components/card/TypeIcon.tsx`, no nome do
+  tipo sob a carta e nas três linhas do painel que carregam um elemento. Sempre
+  decorativo (`alt=""`): o nome está escrito ao lado.
+- **RFCs conciliadas.** Adendo de supersessão na RFC 4.4 e em `layout-spec.md`,
+  com a tabela real de 18 tipos; `decisions.md` ganhou D11 (os 18 tipos) e D12
+  (derivações e radar só no site). `design-system.md`, `assets-brief.md` e
+  `data-mapping.md` atualizados.
+
+**Ainda não há radar para carta de repositório.** Os cinco eixos de `ratings.ts`
+são de perfil (seguidores, anos de conta) e não têm equivalente óbvio num repo.
+Com as derivações no lugar, as duas colunas já não saem vazias — mas a esquerda
+do repo é mais leve que a do perfil, que tem radar em cima. É decisão de produto,
+não pendência de código.
 
 ## Padrão que se repetiu, e vale herdar
 
@@ -103,12 +120,27 @@ Corolário prático: **renderize e olhe antes de dizer que está pronto.** Vale
 para carta (`PREVIEW=<dir> npx vitest run tests/unit/render-card.test.ts` grava
 os PNGs) e para página (dev server + screenshot).
 
+O padrão se repetiu de novo nos ícones de tipo: pôr o disco dentro de
+`.why-value` exigiu trocar `text-align` por flex, e isso desfez o espelhamento da
+coluna esquerda — o valor, que ia para a borda de fora, colou no rótulo. Typecheck
+e 103 testes verdes; só o screenshot mostrou. A regra específica que sobra:
+**quando um elemento vira flex, todo `text-align` herdado nele deixou de valer**,
+e é preciso repetir a intenção como `justify-content` em cada override.
+
 Segundo padrão: **cache mascara mudança de domínio.** O cache de cartas é em
 memória em desenvolvimento e sobrevive ao hot reload. Toda vez que uma mudança
 no domínio não apareceu, a causa foi essa — reinicie o servidor. E quando o
 formato da carta muda, suba `CARD_VERSION`: já foi obrigatório duas vezes, por
 `rarity: "holo"` e `element: "neutral"` que deixaram de existir e quebrariam ao
 renderizar, não ao compilar.
+
+**Há um terceiro cache, e ele engana mais que os outros dois:** o navegador. A
+rota de imagem responde `max-age=3600`, então o PNG na tela pode ser de uma hora
+atrás enquanto o HTML ao redor já é novo. O sintoma é a página e a carta
+discordarem — o rodapé da imagem dizia "Hyper Rare" com a página dizendo "Rara
+Ilustrada Especial", e o palpite natural (bug no domínio) estava errado. Antes de
+investigar divergência entre página e imagem, recarregue o PNG com
+`?bust=<agora>`; se sumir, era cache.
 
 ## Ambiente
 

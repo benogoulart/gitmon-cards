@@ -78,22 +78,53 @@ camada metálica. Ver `docs/design-system.md`.
 
 O rodapé ganhou também o **número de série**, à esquerda do símbolo.
 
-## Os 7 elementos
+## Os tipos
+
+Escrito quando eram 7 — o texto original fica, a conciliação vem logo abaixo.
 
 `neutral, fire, water, grass, electric, psychic, fighting`
-
-| Elemento | Fraco contra | Resiste a |
-|---|---|---|
-| fire | water | grass |
-| water | electric | fire |
-| grass | fire | electric |
-| electric | fighting | — |
-| psychic | — | fighting |
-| fighting | psychic | — |
-| neutral | fighting | — |
 
 Cadeia triangular deliberadamente simples — não o quadro de 18 tipos do Pokémon oficial. Mapear
 ~15-20 linguagens comuns do GitHub para 7 elementos é tratável; para 18 tipos não é.
 
+**Conciliado.** São **18 tipos**, não 7, e `neutral` virou `normal` (o nome do
+ícone). O argumento de tratabilidade acima não se sustentou: o mapa
+linguagem→tipo é trabalho de tabela, não de arquitetura. O que os 7 elementos
+custavam era leitura — infraestrutura, shell, verificação formal, funcional,
+legado e contratos caíam todos em `neutral`.
+
+A carta continua imprimindo **uma** fraqueza e **uma** resistência, como esta
+spec previu; o quadro oficial 18×18 foi reduzido a isso, não copiado inteiro.
+
+| Tipo | Fraco contra | Resiste a |
+|---|---|---|
+| normal | fighting | ghost |
+| fire | water | grass |
+| water | electric | fire |
+| grass | fire | water |
+| electric | ground | flying |
+| ice | fire | — |
+| fighting | psychic | rock |
+| poison | psychic | grass |
+| ground | water | poison |
+| flying | electric | grass |
+| psychic | dark | fighting |
+| bug | fire | grass |
+| rock | water | fire |
+| ghost | dark | poison |
+| dragon | fairy | fire |
+| dark | fighting | ghost |
+| steel | fire | grass |
+| fairy | poison | fighting |
+
+Duas leituras exigiram decisão: `normal` e `dark` resistem a `ghost` porque no
+jogo são **imunes** a ele — imunidade é a resistência mais forte que existe, e
+vira a resistência impressa. `ice` fica sem resistência: no quadro oficial só
+resiste ao próprio tipo, e carta que resiste a si mesma lê como defeito.
+
 Essa mesma tabela alimenta o multiplicador de efetividade do motor de batalha: `×2` se o atacante
-é forte contra o defensor, `×0.5` se é resistido (RFC 7.3, item 3).
+é forte contra o defensor, `×0.5` se é resistido (RFC 7.3, item 3). O motor lê a
+fraqueza **impressa na carta**, não esta tabela: numa carta de perfil a fraqueza
+vem da segunda linguagem do dev (RFC 6.1) e pode divergir da cadeia.
+
+Fonte no código: `lib/cards/elements.ts`.

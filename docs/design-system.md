@@ -4,7 +4,7 @@ Registro do sistema **como está hoje**. Fonte: `app/globals.css`, `lib/cards/pa
 
 ## Princípios travados (RFC)
 
-1. **Identidade autônoma (RFC 9.3).** A marca do produto não herda a paleta pessoal do autor. A paleta das cartas é outra coisa ainda: segue os 7 elementos, não a marca.
+1. **Identidade autônoma (RFC 9.3).** A marca do produto não herda a paleta pessoal do autor. A paleta das cartas é outra coisa ainda: segue os 18 tipos, não a marca.
 2. **Tom técnico-neutro (RFC 9.2).** Erros e textos dizem o que aconteceu e param. Sem piada, sem humanização.
 3. **A imagem exportada é limpa (RFC 9.6).** Patrocínio e marca pessoal vivem só no site; o PNG que viaja para o README de outra pessoa não carrega nada disso.
 4. **Animação é enfeite (RFC 7.2).** Toca a cada visita, sem estado por visitante, e desaparece inteira sob `prefers-reduced-motion`.
@@ -29,11 +29,25 @@ Dark-only. Sem modo claro.
 --danger      #e2622f     dano / efetividade
 ```
 
-### Elementos (só nas cartas)
+### Tipos (só nas cartas)
 
-`neutral #B8AE9C` · `fire #E2622F` · `water #2F86C4` · `grass #3F9E52` · `electric #D9A81C` · `psychic #9B54B5` · `fighting #B4522F`
+São 18, não os 7 elementos da RFC 4.4 — ver o adendo naquela seção.
 
-Cada um tem `base` / `dark` / `light` / `ink` em `lib/cards/palette.json`. O elemento ativo entra como `--element` no `.card-panel`.
+`normal #828282` · `fire #E4613E` · `water #3099E1` · `grass #439837` · `electric #DFBC28` · `ice #47C8C8` · `fighting #E49021` · `poison #9354CB` · `ground #A4733C` · `flying #74AAD0` · `psychic #E96C8C` · `bug #9F9F28` · `rock #A9A481` · `ghost #6F4570` · `dragon #576FBC` · `dark #4F4747` · `steel #74B0CB` · `fairy #E18CE1`
+
+Nenhuma dessas cores foi escolhida à mão: cada `base` foi **extraída do disco
+colorido do ícone** do tipo em `scripts/assets/types/`. É o que garante que o
+ícone e a moldura recolorida nunca divirjam — são a mesma cor por construção, não
+por disciplina.
+
+Cada um tem `base` / `dark` / `light` / `ink` em `lib/cards/palette.json`, os três
+últimos derivados do `base` por mistura fixa (45% preto, 78% branco, 80% preto). O
+tipo ativo entra como `--element` no `.card-panel`.
+
+Os mesmos SVGs são copiados para `public/assets/types/` pelo build e usados
+diretamente na interface (`components/card/TypeIcon.tsx`) — no nome do tipo sob a
+carta e nas linhas de tipo, fraqueza e resistência do painel de explicação.
+Sempre decorativos: o nome do tipo está escrito ao lado.
 
 ## Tipografia
 
@@ -89,7 +103,7 @@ Full-art: a janela sobe até a borda e desce até `448`, onde os ataques começa
 
 `hyper_rare` volta ao layout padrão de propósito: no TCG a secret dourada é gravada sobre a carta normal, e é isso que a distingue da `special_illustration_rare` sem depender de contar estrelas.
 
-Ouro e prata são os únicos valores fora de `palette.json` — aquela paleta é dos sete elementos e não tem metais. Vivem em `lib/cards/rarity.ts`, onde só a raridade os usa.
+Ouro e prata são os únicos valores fora de `palette.json` — aquela paleta é dos 18 tipos e não tem metais. Vivem em `lib/cards/rarity.ts`, onde só a raridade os usa.
 
 O corte de `double_rare` em 1500 é uma **restrição, não uma preferência**: é o limiar que faz o bônus de atividade de `repo.ts` decidir entre tiers. Baixá-lo faz repositório mantido e abandonado caírem no mesmo lugar (coberto por `tests/unit/repo-card.test.ts`).
 
