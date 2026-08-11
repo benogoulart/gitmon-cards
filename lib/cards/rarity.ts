@@ -38,11 +38,11 @@ export function rarityForScore(score: number): Rarity {
 export function raritySymbol(rarity: Rarity): string {
   switch (rarity) {
     case "common":
-      return "⬤"; // ⬤
+      return "●";
     case "uncommon":
-      return "◆"; // ◆
+      return "◆";
     default:
-      return "★"; // ★
+      return "★";
   }
 }
 

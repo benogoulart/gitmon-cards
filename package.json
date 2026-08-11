@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "assets": "node scripts/build-assets.mjs"
+    "assets": "node scripts/build-assets.mjs",
+    "fonts": "node scripts/build-fonts.mjs"
   },
   "dependencies": {
     "ioredis": "^6.0.0",
@@ -28,6 +29,7 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "subset-font": "^2.5.0",
     "typescript": "^5.9.0",
     "vitest": "^3.2.0"
   },

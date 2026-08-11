@@ -1,3 +1,4 @@
+import palette from "./palette.json";
 import type { Card, Element } from "./types";
 
 /**
@@ -18,23 +19,19 @@ export const ELEMENT_CHAIN: Record<
   neutral: { weakTo: "fighting", resists: null },
 };
 
+export interface ElementColors {
+  base: string;
+  dark: string;
+  light: string;
+  ink: string;
+}
+
 /**
- * Cor de identidade de cada elemento. É daqui que a moldura SVG é recolorida
- * (caminho C da RFC 8) — a paleta segue os elementos, não a marca pessoal do
- * autor (RFC 9.3).
+ * Cor de identidade de cada elemento. A definição mora em `palette.json` porque o
+ * gerador de arte (`scripts/build-assets.mjs`) lê o mesmo arquivo — moldura e
+ * interface recoloridas por duas fontes diferentes seria erro garantido.
  */
-export const ELEMENT_COLORS: Record<
-  Element,
-  { base: string; dark: string; light: string; ink: string }
-> = {
-  neutral: { base: "#B8AE9C", dark: "#6E6659", light: "#EDE7DA", ink: "#2B2721" },
-  fire: { base: "#E2622F", dark: "#8C3312", light: "#FBD9C4", ink: "#3A1508" },
-  water: { base: "#2F86C4", dark: "#12456E", light: "#C8E4F7", ink: "#08202F" },
-  grass: { base: "#3F9E52", dark: "#1B5227", light: "#CDECD2", ink: "#0B2412" },
-  electric: { base: "#D9A81C", dark: "#8A6403", light: "#FAEEBF", ink: "#33260A" },
-  psychic: { base: "#9B54B5", dark: "#54216A", light: "#E9D2F2", ink: "#2A0F35" },
-  fighting: { base: "#B4522F", dark: "#6B2611", light: "#F0D2C5", ink: "#301207" },
-};
+export const ELEMENT_COLORS = palette as unknown as Record<Element, ElementColors>;
 
 /**
  * Linguagem do GitHub → elemento.
