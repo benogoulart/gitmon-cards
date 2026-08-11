@@ -807,19 +807,107 @@ select {
 
 /* --------------------------------------------------------- painel da carta */
 
+/*
+ * Três colunas com a carta ao centro: ela é o eixo da página, não um item
+ * encostado na margem. As laterais têm a mesma largura para o equilíbrio não
+ * depender de quanto texto cada lado recebeu.
+ */
 .card-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+
+  /*
+   * Escapa da largura do shell. Três colunas em 1080px espremem as laterais até
+   * o texto vazar; a carta sozinha já ocupa 340px do meio. O `100vw` com margem
+   * negativa alarga só esta página, sem mexer no shell das outras.
+   */
+  width: min(1360px, 100vw - 40px);
+  margin-inline: calc(50% - min(680px, 50vw - 20px));
+}
+
+.card-center {
   display: flex;
-  gap: 44px;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.card-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  min-width: 0;
+}
+
+/* A coluna esquerda alinha à direita, mirando a carta. */
+.card-aside-left {
+  text-align: right;
+}
+
+.card-aside-left .why li {
+  text-align: right;
+}
+
+.card-aside-left .why-label {
+  order: 2;
+}
+
+.card-aside-left .why-value {
+  order: 1;
+  text-align: left;
+}
+
+/* `order` reordena todos os itens do grid: sem isto o motivo sobe para cima do
+   valor, porque o padrão 0 vem antes do 1 e do 2 acima. */
+.card-aside-left .why-reason {
+  order: 3;
+}
+
+/* Embed e batalha voltam a ocupar a largura toda, abaixo das três colunas. */
+.card-panel > .card-side {
+  grid-column: 1 / -1;
+}
+
+/*
+ * Abaixo de 900px não há largura para três colunas: a carta sobe para o topo e
+ * as laterais viram uma pilha só. Simetria em coluna única é ruído.
+ */
+@media (max-width: 900px) {
+  .card-panel {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .card-center {
+    order: -1;
+  }
+
+  .card-aside-left,
+  .card-aside-left .why li {
+    text-align: left;
+  }
+
+  .card-aside-left .why-label {
+    order: 0;
+  }
+
+  .card-aside-left .why-value {
+    order: 0;
+    text-align: right;
+  }
 }
 
 .card-side {
   display: flex;
   flex-direction: column;
   gap: 26px;
-  flex: 1 1 320px;
   min-width: 0;
+}
+
+.card-headline {
+  text-align: center;
 }
 
 .card-headline h1 {

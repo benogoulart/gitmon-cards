@@ -28,15 +28,22 @@ function localize(
 export function StatBreakdown({
   derivations,
   locale,
+  heading = true,
 }: {
   derivations: Derivation[];
   locale: Locale;
+  /**
+   * As derivações são partidas entre as duas colunas que flanqueiam a carta, e
+   * duas metades da mesma lista não podem repetir o título — é uma seção só,
+   * dividida por razão de layout.
+   */
+  heading?: boolean;
 }) {
   const t = translator(locale);
 
   return (
     <section className="why">
-      <h2>{t("why.title")}</h2>
+      {heading ? <h2>{t("why.title")}</h2> : null}
       <ul>
         {derivations.map((item) => (
           <li key={item.labelKey}>

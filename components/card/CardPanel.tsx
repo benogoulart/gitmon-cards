@@ -28,6 +28,15 @@ export function CardPanel({
   const markdown = `[![${card.name}](${embedUrl})](${card.sourceUrl})`;
   const colors = ELEMENT_COLORS[card.element];
 
+  /*
+   * Corte ao meio, com o resto sobrando para a direita — a esquerda já carrega
+   * o radar, então a coluna mais leve em texto é a que tem o peso visual maior.
+   */
+  const derivations = card.derivations ?? [];
+  const half = Math.ceil(derivations.length / 2);
+  const left = derivations.slice(0, half);
+  const right = derivations.slice(half);
+
   return (
     <div className="card-panel" style={{ ["--element" as string]: colors.base }}>
       {/*
@@ -37,14 +46,26 @@ export function CardPanel({
       */}
       <PackOpening name={card.name} locale={locale} />
 
-      <TiltCard
-        src={imagePath}
-        alt={`${card.name} — ${t(elementKey(card.element))}`}
-        priority
-        foil={hasFoil(card.rarity)}
-      />
+      {/*
+        Arranjo simétrico: a carta é o eixo da página, com os valores derivados
+        divididos entre as duas colunas que a flanqueiam. As derivações são
+        partidas ao meio em vez de empilhadas de um lado só — com tudo à direita
+        a página fica pesada de um lado e a carta vira ilustração, não centro.
+      */}
+      <div className="card-aside card-aside-left">
+        {card.ratings && card.ratings.length > 0 ? (
+          <RadarChart ratings={card.ratings} locale={locale} />
+        ) : null}
+        {left.length > 0 ? <StatBreakdown derivations={left} locale={locale} /> : null}
+      </div>
 
-      <div className="card-side">
+      <div className="card-center">
+        <TiltCard
+          src={imagePath}
+          alt={`${card.name} — ${t(elementKey(card.element))}`}
+          priority
+          foil={hasFoil(card.rarity)}
+        />
         <div className="card-headline">
           <h1>{card.name}</h1>
           <p>
@@ -52,7 +73,12 @@ export function CardPanel({
             {t(card.kind === "profile" ? "card.profile" : "card.repo")}
           </p>
         </div>
+      </div>
 
+      <div className="card-aside card-aside-right">
+        {right.length > 0 ? (
+          <StatBreakdown derivations={right} locale={locale} heading={false} />
+        ) : null}
         <dl className="stat-grid">
           {card.stats.map((stat) => (
             <div key={stat.labelKey}>
@@ -61,15 +87,9 @@ export function CardPanel({
             </div>
           ))}
         </dl>
+      </div>
 
-        {card.ratings && card.ratings.length > 0 ? (
-          <RadarChart ratings={card.ratings} locale={locale} />
-        ) : null}
-
-        {card.derivations && card.derivations.length > 0 ? (
-          <StatBreakdown derivations={card.derivations} locale={locale} />
-        ) : null}
-
+      <div className="card-side">
         <section className="embed">
           <h2>{t("home.embed")}</h2>
           <CopyField value={markdown} copyLabel={t("home.copy")} copiedLabel={t("home.copied")} />
