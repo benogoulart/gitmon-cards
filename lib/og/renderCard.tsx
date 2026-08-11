@@ -344,8 +344,11 @@ function AttackRow({
         ) : null}
       </div>
 
+      {/* flexShrink 0: sem isto um nome de ataque longo espreme o dano até
+          sumir, e o número é a informação mais importante da linha. */}
       <span
         style={{
+          flexShrink: 0,
           fontSize: layout.attacks.damageSize,
           fontWeight: 900,
           color: ink,
@@ -382,6 +385,7 @@ function EnergyCost({ cost, icon }: { cost: number; icon: string }) {
         alignItems: "center",
         justifyContent: "center",
         gap: 2,
+        flexShrink: 0,
         width: layout.attacks.energyColumnWidth,
       }}
     >

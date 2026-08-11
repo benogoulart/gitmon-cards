@@ -11,6 +11,13 @@ export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "pt";
 
 /**
+ * Cookie do idioma. Mora aqui e não em `./server` porque o toggle é um componente
+ * de cliente — importar do módulo de servidor arrastaria `next/headers` para o
+ * bundle do navegador.
+ */
+export const LOCALE_COOKIE = "gitmon_locale";
+
+/**
  * A **imagem** da carta, ao contrário do site, tem outro padrão: inglês.
  * Ela viaja para dentro do README de qualquer pessoa e não tem como seguir o
  * toggle de quem está vendo — `?lang=pt` na URL cobre quem quiser o contrário.
@@ -58,6 +65,7 @@ const pt = {
   "error.rate_limit": "Limite da API do GitHub atingido. Tente novamente em alguns minutos.",
   "error.no_token": "Servidor sem token do GitHub configurado.",
   "error.upstream": "A API do GitHub não respondeu.",
+  "error.battle_expired": "Este resultado de batalha expirou. Gere uma nova batalha.",
 
   "home.tagline": "Cartas geradas a partir de dados reais do GitHub.",
   "home.description":
@@ -86,6 +94,7 @@ const pt = {
   "battle.remaining": "{hp} PS restantes",
   "battle.share": "Compartilhar resultado",
   "battle.rematch": "Batalhar de novo",
+  "battle.skip": "Pular animação",
 } as const;
 
 export type MessageKey = keyof typeof pt;
@@ -126,6 +135,7 @@ const en: Record<MessageKey, string> = {
   "error.rate_limit": "GitHub API rate limit reached. Try again in a few minutes.",
   "error.no_token": "Server has no GitHub token configured.",
   "error.upstream": "The GitHub API did not respond.",
+  "error.battle_expired": "This battle result has expired. Run a new battle.",
 
   "home.tagline": "Cards generated from real GitHub data.",
   "home.description": "One image URL, no login, updating on its own. Paste it in your README.",
@@ -153,6 +163,7 @@ const en: Record<MessageKey, string> = {
   "battle.remaining": "{hp} HP left",
   "battle.share": "Share result",
   "battle.rematch": "Battle again",
+  "battle.skip": "Skip animation",
 };
 
 const DICTIONARIES: Record<Locale, Record<MessageKey, string>> = { pt, en };

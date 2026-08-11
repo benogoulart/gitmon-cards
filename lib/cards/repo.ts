@@ -4,6 +4,7 @@ import {
   clamp,
   costForDamage,
   daysSince,
+  roundDamage,
   roundToTen,
   truncate,
   year,
@@ -63,7 +64,8 @@ export function buildRepoCard(
       { labelKey: "stat.stars", value: repo.stargazers_count },
       { labelKey: "stat.forks", value: repo.forks_count },
       { labelKey: "stat.issues", value: repo.open_issues_count },
-      { labelKey: "stat.since", value: year(repo.created_at) },
+      // String, não número: ano formatado como número vira "2.013".
+      { labelKey: "stat.since", value: String(year(repo.created_at)) },
     ],
     sourceUrl: repo.html_url,
   };
@@ -95,7 +97,7 @@ function attacksFrom(repo: GitHubRepo, contributors: GitHubContributor[]): Attac
     .slice(0, 2);
 
   if (humans.length === 0) {
-    const damage = clamp(repo.stargazers_count * 2, 10, 300);
+    const damage = roundDamage(clamp(repo.stargazers_count * 2, 10, 300));
     return [
       {
         name: truncate(repo.name, 22),
@@ -107,7 +109,12 @@ function attacksFrom(repo: GitHubRepo, contributors: GitHubContributor[]): Attac
   }
 
   return humans.map((person) => {
-    const damage = clamp(person.contributions * 2, 10, 300);
+    // Log, e não `contribuições × 2`: com escala linear qualquer repositório
+    // sério satura os 300 nos dois ataques, e as duas linhas ficam idênticas.
+    // No log, 10 commits dão 50, 1.000 dão 140 e 10.000 dão 180.
+    const damage = roundDamage(
+      clamp(45 * Math.log10(1 + person.contributions), 10, 300),
+    );
     return {
       name: truncate(person.login, 22),
       cost: costForDamage(damage),
@@ -118,9 +125,13 @@ function attacksFrom(repo: GitHubRepo, contributors: GitHubContributor[]): Attac
   });
 }
 
+/**
+ * Descrição curta: o rodapé divide a linha com a contagem de estrelas, e 64
+ * caracteres empurravam o ano para fora do quadro.
+ */
 function repoFooter(repo: GitHubRepo): string {
   const parts: string[] = [];
-  if (repo.description) parts.push(truncate(repo.description, 64));
+  if (repo.description) parts.push(truncate(repo.description, 38));
   parts.push(`${repo.owner.login} · ${year(repo.created_at)}`);
   return parts.join(" · ");
 }

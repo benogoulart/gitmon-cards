@@ -8,7 +8,9 @@ export type GitmonErrorCode =
   | "organization"
   | "rate_limit"
   | "no_token"
-  | "upstream";
+  | "upstream"
+  /** Link de batalha que já passou do TTL — ver lib/battle/store.ts. */
+  | "battle_expired";
 
 export class GitmonError extends Error {
   readonly code: GitmonErrorCode;
@@ -26,6 +28,7 @@ export class GitmonError extends Error {
 export function httpStatusFor(code: GitmonErrorCode): number {
   switch (code) {
     case "not_found":
+    case "battle_expired":
       return 404;
     case "organization":
       // Não é erro do cliente nem do servidor: o recurso existe, o produto é que

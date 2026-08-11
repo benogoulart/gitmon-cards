@@ -1,0 +1,9 @@
+# Normaliza fim de linha: o repositório guarda LF, o checkout usa o do sistema.
+* text=auto eol=lf
+
+# Binários — nunca normalizar.
+*.png binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.ico binary

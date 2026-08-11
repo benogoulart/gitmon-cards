@@ -4,6 +4,7 @@ import { ELEMENT_CHAIN, elementForLanguage } from "./elements";
 import {
   clamp,
   costForDamage,
+  roundDamage,
   roundToTen,
   truncate,
   year,
@@ -75,7 +76,8 @@ export function buildProfileCard(
       { labelKey: "stat.stars", value: totalStars },
       { labelKey: "stat.followers", value: user.followers },
       { labelKey: "stat.repos", value: user.public_repos },
-      { labelKey: "stat.since", value: year(user.created_at) },
+      // String, não número: ano formatado como número vira "2.011".
+      { labelKey: "stat.since", value: String(year(user.created_at)) },
     ],
     sourceUrl: user.html_url,
   };
@@ -110,7 +112,7 @@ function attacksFromRepos(repos: GitHubRepo[]): Attack[] {
     )
     .slice(0, 2)
     .map((repo) => {
-      const damage = clamp(repo.stargazers_count * 4, 10, 300);
+      const damage = roundDamage(clamp(repo.stargazers_count * 4, 10, 300));
       return {
         name: truncate(repo.name, 22),
         cost: costForDamage(damage),

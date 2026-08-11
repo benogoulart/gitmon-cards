@@ -67,8 +67,24 @@ describe("ataques", () => {
       NOW,
     );
     expect(card.attacks.map((a) => a.name)).toEqual(["maior", "medio"]);
-    expect(card.attacks[0].damage).toBe(240);
+    // 45 × log10(121) = 93,7 → 90, sempre em dezenas.
+    expect(card.attacks[0].damage).toBe(90);
     expect(card.attacks[0].text).toBe("120 commits");
+  });
+
+  it("mantém os dois ataques distintos mesmo num repositório enorme", () => {
+    // Com escala linear os dois saturavam em 300 e as linhas ficavam idênticas.
+    const card = buildRepoCard(
+      repo(),
+      [
+        contributor({ login: "a", contributions: 1939 }),
+        contributor({ login: "b", contributions: 1778 }),
+      ],
+      NOW,
+    );
+    expect(card.attacks[0].damage).toBeLessThan(300);
+    expect(card.attacks[0].damage % 10).toBe(0);
+    expect(card.attacks[0].damage).toBeGreaterThanOrEqual(card.attacks[1].damage);
   });
 
   it("descarta bots — eles inflariam o dano sem significar nada", () => {

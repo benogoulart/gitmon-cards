@@ -70,6 +70,48 @@ export async function getRepoCard(owner: string, name: string): Promise<Card> {
   );
 }
 
+export interface RepoSummary {
+  name: string;
+  stars: number;
+  language: string | null;
+  description: string | null;
+}
+
+/**
+ * Lista enxuta dos repositórios de um perfil, para a interface sugerir cartas de
+ * repositório depois de uma busca de perfil (RFC 9.4).
+ *
+ * Guardada separada da carta porque é outro recorte do mesmo dado: a carta usa só
+ * os dois mais estrelados, a lista mostra vários.
+ */
+export async function getProfileRepos(
+  login: string,
+  limit = 12,
+): Promise<RepoSummary[]> {
+  if (!isValidLogin(login)) return [];
+
+  return cached(
+    `repos:${CARD_VERSION}:${login.toLowerCase()}:${limit}`,
+    CARD_DATA_TTL_SECONDS,
+    async () => {
+      const repos = await fetchUserRepos(login);
+      return repos
+        .filter((repo) => !repo.fork)
+        .sort(
+          (a, b) =>
+            b.stargazers_count - a.stargazers_count || a.name.localeCompare(b.name),
+        )
+        .slice(0, limit)
+        .map((repo) => ({
+          name: repo.name,
+          stars: repo.stargazers_count,
+          language: repo.language,
+          description: repo.description,
+        }));
+    },
+  );
+}
+
 /** Resolve `torvalds` ou `facebook/react` para a carta correspondente. */
 export async function getCard(id: string): Promise<Card> {
   const [owner, name, ...rest] = id.split("/");

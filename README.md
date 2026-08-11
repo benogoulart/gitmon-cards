@@ -9,8 +9,33 @@ Uma URL de imagem estática, sem login, embutível em qualquer README, que se at
 <host>/battle/<battle-id>.png    → resultado estático de uma batalha
 ```
 
-> **Status:** scaffold. Nenhuma implementação ainda — só a estrutura e a documentação de spec.
+> **Status:** v1 funcional em desenvolvimento local. Cartas de perfil e de repositório, batalha
+> com resultado compartilhável, site bilíngue. Não publicado — ver `docs/decisions.md` (Q12).
 > A especificação completa está em [`docs/rfc-001-gitmon-cards.md`](docs/rfc-001-gitmon-cards.md).
+
+## Rodando
+
+```bash
+npm install
+cp .env.example .env.local   # preencha GITHUB_TOKEN
+npm run dev
+```
+
+`GITHUB_TOKEN` é um token de leitura pública qualquer (5.000 req/h). Sem ele, as rotas de imagem
+devolvem uma carta de erro dizendo isso. `REDIS_URL` é opcional em desenvolvimento — sem ele o
+cache é por processo; em produção é obrigatório (RFC 11).
+
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm test` | Testes unitários (fórmulas, batalha, renderização) |
+| `PREVIEW=<dir> npm test` | Grava os PNGs renderizados em disco para inspeção visual |
+| `npm run assets` | Regenera molduras, ícones e foil a partir de `scripts/lib/art.mjs` |
+| `npm run fonts` | Baixa e subseta a fonte da carta |
+| `npm run test:e2e` | Playwright (precisa de `npx playwright install chromium`) |
+
+A arte e as fontes são versionadas — `assets` e `fonts` só precisam rodar quando o desenho ou o
+repertório de caracteres mudar.
 
 ---
 
@@ -50,13 +75,19 @@ components/
   ui/                          primitivas compartilhadas, toggle PT/EN
 
 lib/
-  github/                      cliente da API do GitHub + normalização
+  github/                      cliente da API do GitHub + erros tipados
   cards/                       scoring: HP, tipo, ataques, fraqueza, recuo, raridade
+    layout.json                geometria da carta em pixels — fonte única
+    palette.json               cor dos 7 elementos — fonte única
   battle/                      motor de simulação turno-a-turno (RFC 7.3)
-  og/                          renderCard — Satori + composição sharp
-  cache/                       camada Redis
+  og/                          renderCard, renderBattle — Satori + composição sharp
+  cache/                       Redis, com fallback em memória para dev
   i18n/                        dicionários PT/EN (obrigatório desde a v1, RFC 9.1)
-  utils/
+  config.ts                    URLs e políticas de cache — sem domínio hardcoded
+
+scripts/
+  build-assets.mjs             gera moldura, energia, recuo e foil (SVG → PNG)
+  build-fonts.mjs              baixa e subseta a fonte da carta
 
 public/assets/
   frames/                      7 molduras, uma por elemento — arte ORIGINAL

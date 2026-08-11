@@ -6,22 +6,34 @@ import type Redis from "ioredis";
  * um pico de tráfego esgota o rate limit do token (RFC 11).
  */
 
-let client: Redis | null = null;
-let clientPromise: Promise<Redis | null> | null = null;
-
 /**
- * Fallback em memória para desenvolvimento sem REDIS_URL. Vive por processo, então
- * em serverless não sobrevive entre invocações — o que é aceitável, porque em
- * produção o Redis existe. O ponto aqui é não bater na API a cada hot reload.
+ * Estado pendurado no `globalThis`.
+ *
+ * Em desenvolvimento o Next recompila e reavalia módulos por bundle de rota: um
+ * `Map` no escopo do módulo dá uma instância para a página e outra para a rota de
+ * imagem. O sintoma é específico e confuso — a batalha é criada pela página e o
+ * pôster responde 404, porque cada lado tem seu próprio cache. Pendurar no
+ * `globalThis` deixa o estado realmente por processo. Também evita abrir uma
+ * conexão Redis nova a cada hot reload.
  */
-const memory = new Map<string, { value: string; expiresAt: number }>();
+const store = globalThis as typeof globalThis & {
+  __gitmonCache?: {
+    client: Redis | null;
+    clientPromise: Promise<Redis | null> | null;
+    memory: Map<string, { value: string; expiresAt: number }>;
+  };
+};
+
+store.__gitmonCache ??= { client: null, clientPromise: null, memory: new Map() };
+const state = store.__gitmonCache;
+const memory = state.memory;
 
 async function getClient(): Promise<Redis | null> {
   const url = process.env.REDIS_URL?.trim();
   if (!url) return null;
-  if (client) return client;
+  if (state.client) return state.client;
 
-  clientPromise ??= (async () => {
+  state.clientPromise ??= (async () => {
     const { default: RedisCtor } = await import("ioredis");
     const instance = new RedisCtor(url, {
       lazyConnect: true,
@@ -34,16 +46,16 @@ async function getClient(): Promise<Redis | null> {
     });
     try {
       await instance.connect();
-      client = instance;
+      state.client = instance;
       return instance;
     } catch (error) {
       console.error("[cache] conexão falhou, seguindo sem cache:", error);
-      clientPromise = null;
+      state.clientPromise = null;
       return null;
     }
   })();
 
-  return clientPromise;
+  return state.clientPromise;
 }
 
 async function read(key: string): Promise<string | null> {

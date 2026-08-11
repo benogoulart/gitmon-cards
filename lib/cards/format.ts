@@ -41,6 +41,18 @@ export function truncate(text: string, max: number): string {
 }
 
 /**
+ * Dano sempre em dezenas.
+ *
+ * Presentacional, não estrutural: a fórmula da RFC 6.1 (`estrelas×4`) continua
+ * inteira — mesma curva, mesmo teto —, só o número impresso é arredondado. Carta
+ * de TCG não tem ataque de 84 de dano, e fidelidade visual é objetivo declarado
+ * do projeto (RFC 5).
+ */
+export function roundDamage(value: number): number {
+  return Math.max(10, Math.round(value / 10) * 10);
+}
+
+/**
  * Custo de energia derivado do dano. Ataque forte custa caro — é o que impede a
  * carta de virar só "quem tem mais estrela ganha" quando o custo passar a
  * importar em variantes futuras da batalha.
