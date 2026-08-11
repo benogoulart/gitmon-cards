@@ -58,9 +58,25 @@ Escolhida a largura, mantê-la como constante única — o gitfut converte tudo 
 | incomum | `◆` |
 | raro | `★` |
 
-O RFC seção 6.1 usa 5 tiers no scoring de perfil (`common / uncommon / rare / holo / secret`) contra
-os 3 símbolos daqui — **conciliar na implementação**: ou os 2 tiers extras ganham símbolo próprio,
-ou `holo`/`secret` reusam `★` e se diferenciam só pela moldura/foil.
+**Conciliado.** O scoring usa 8 tiers (padrão do TCG Pokémon), não os 5 da RFC 6.1,
+e não cabem em 3 símbolos. A leitura passou a ser **contagem + cor**:
+
+| Tier | Símbolo | Cor |
+|---|---|---|
+| common | `●` | ink |
+| uncommon | `◆` | ink |
+| rare | `★` | ink |
+| double_rare | `★★` | ink |
+| illustration_rare | `★` | ouro |
+| ultra_rare | `★★` | prata |
+| special_illustration_rare | `★★` | ouro |
+| hyper_rare | `★★★` | ouro |
+
+Como contagem e cor ainda deixavam três tiers quase idênticos (a arte é sempre o
+mesmo avatar na mesma moldura), a distinção real é **tratamento**: full-art e
+camada metálica. Ver `docs/design-system.md`.
+
+O rodapé ganhou também o **número de série**, à esquerda do símbolo.
 
 ## Os 7 elementos
 

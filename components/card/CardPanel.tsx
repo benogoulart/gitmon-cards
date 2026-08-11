@@ -1,8 +1,11 @@
 import { ELEMENT_COLORS } from "@/lib/cards/elements";
+import { hasFoil } from "@/lib/cards/rarity";
 import type { Card } from "@/lib/cards/types";
 import { absoluteUrl } from "@/lib/config";
 import { elementKey, rarityKey, translator, type Locale } from "@/lib/i18n/dictionaries";
 import { CopyField } from "@/components/ui/CopyField";
+import { PackOpening } from "./PackOpening";
+import { StatBreakdown } from "./StatBreakdown";
 import { TiltCard } from "./TiltCard";
 
 /**
@@ -26,7 +29,19 @@ export function CardPanel({
 
   return (
     <div className="card-panel" style={{ ["--element" as string]: colors.base }}>
-      <TiltCard src={imagePath} alt={`${card.name} — ${t(elementKey(card.element))}`} priority />
+      {/*
+        O pacote cobre a tela até ser rasgado ou pulado. Fica aqui, e não na
+        busca, para que um link direto para /torvalds também abra pacote — a
+        revelação é da carta, não do ato de pesquisar.
+      */}
+      <PackOpening name={card.name} locale={locale} />
+
+      <TiltCard
+        src={imagePath}
+        alt={`${card.name} — ${t(elementKey(card.element))}`}
+        priority
+        foil={hasFoil(card.rarity)}
+      />
 
       <div className="card-side">
         <div className="card-headline">
@@ -45,6 +60,10 @@ export function CardPanel({
             </div>
           ))}
         </dl>
+
+        {card.derivations && card.derivations.length > 0 ? (
+          <StatBreakdown derivations={card.derivations} locale={locale} />
+        ) : null}
 
         <section className="embed">
           <h2>{t("home.embed")}</h2>

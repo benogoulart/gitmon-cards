@@ -58,6 +58,8 @@ export function buildRepoCard(
     // 1 pip por 50 issues abertas, teto de 4. Ver justificativa (2) acima.
     retreat: clamp(1 + Math.floor(repo.open_issues_count / 50), 1, 4),
     rarity: rarityForScore(score),
+    // Atribuído fora daqui — ver `withSerial` em `./serial.ts`.
+    serial: null,
     artUrl: repo.owner.avatar_url,
     footer: repoFooter(repo),
     stats: [
@@ -103,7 +105,9 @@ function attacksFrom(repo: GitHubRepo, contributors: GitHubContributor[]): Attac
         name: truncate(repo.name, 22),
         cost: costForDamage(damage),
         damage,
-        text: repo.description ? truncate(repo.description, 64) : "",
+        // 38 pelo mesmo motivo de `profile.ts`: é o que cabe na coluna de texto
+        // do ataque sem o renderizador cortar a seco por cima.
+        text: repo.description ? truncate(repo.description, 38) : "",
       },
     ];
   }

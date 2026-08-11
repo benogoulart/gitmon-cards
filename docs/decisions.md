@@ -24,7 +24,7 @@ arquivo registra o que foi decidido depois dele e o que ainda falta decidir.
 |---|---|---|
 | Q1 | Caminho de arte (RFC 8) | **Caminho C.** Moldura vetorial única recolorida por elemento, foil como camada separada nos tiers altos, tudo gerado por código em `scripts/build-assets.mjs`. Arte 100% original. |
 | Q2 | Fórmulas da carta de repositório (RFC 6.2) | Escala **logarítmica** para HP e para o dano dos contribuidores. No linear, qualquer repo com ~70 estrelas satura o HP e todo repo popular vira a mesma carta. Ver `lib/cards/repo.ts`. |
-| Q3 | 5 tiers de raridade × 3 símbolos de layout | `holo` e `secret` reusam a estrela e se diferenciam pela moldura e pelo foil, não pelo glifo. |
+| Q3 | Tiers de raridade × 3 símbolos de layout | **Revisto.** A resolução original conciliava os 5 tiers da RFC 6.1 com os 3 símbolos do layout reusando `★` em `holo` e `secret`. O sistema passou depois para **8 tiers no padrão do TCG Pokémon**, e a leitura virou **contagem + cor** de estrela (uma, duas ou três; preta, prateada ou dourada), mais **tratamento de arte** (full-art e camada metálica). Ver `docs/design-system.md` e `lib/cards/rarity.ts`. |
 | Q4 | Dimensão do canvas | **500 × 700.** A proporção física do RFC (8,8 × 6,3 cm) dá 0,716; 500/700 dá 0,714. Todas as posições em `lib/cards/layout.json`. |
 | Q5 | "Fraqueza a manutenção" não é um dos 7 elementos | `open_issues_count` vira **custo de recuo**, não fraqueza: 1 pip por 50 issues. Mesma leitura ("repo com fila grande é difícil de largar") sem furar o sistema de tipos nem quebrar a cadeia de efetividade. |
 | Q6 | Onde persiste o `battle-id` | Redis com TTL (`BATTLE_TTL_SECONDS`, padrão 30 dias), guardando o resultado completo. Link expirado devolve uma carta de erro explicando, não um 404 mudo. |

@@ -12,10 +12,17 @@ não arquivo.** Toda moldura, ícone de tipo e ícone de energia deste projeto �
 | Asset | Quantidade | Destino |
 |---|---|---|
 | Moldura de carta | 7 (uma por elemento) | `public/assets/frames/` |
+| Moldura full-art | 7 (uma por elemento) | `public/assets/frames/fullart-*` |
 | Ícone de energia/custo | 7 | `public/assets/energy/` |
 | Ícone de tipo (pequeno — fraqueza/resistência/recuo) | 7 + 1 de recuo | `public/assets/icons/` |
-| Overlay de holo/foil | 1-2 (só raridades altas) | `public/assets/frames/` |
+| Overlay de foil | 6 (um por tier a partir de `rare`) | `public/assets/frames/foil-*` |
+| Overlay metálico | 2 (ouro e prata) | `public/assets/frames/metal-*` |
 | Fontes | 1-2 famílias, licença livre para embed | `public/assets/fonts/` |
+
+O foil deixou de ser "1-2 só nas raridades altas": no TCG a `rare` já vem com
+holográfico básico, então são **seis** tiers com foil. Somaram-se ainda as
+molduras full-art e os dois metais, que são o que distingue os tiers de
+ilustração entre si. Tudo gerado por `scripts/build-assets.mjs`.
 
 Elementos: `neutral, fire, water, grass, electric, psychic, fighting`.
 

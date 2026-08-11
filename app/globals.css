@@ -198,6 +198,362 @@ select {
   font-weight: 700;
 }
 
+/* -------------------------------------------- de onde saem estes números */
+
+.why ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/*
+ * Rótulo e valor na primeira linha, motivo embaixo ocupando a largura toda: o
+ * motivo é frase, não dado tabular, e espremê-lo numa coluna o tornaria ilegível
+ * exatamente nos casos mais interessantes (nomes longos de repositório).
+ */
+.why li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+}
+
+.why-label {
+  color: var(--text-faint);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  align-self: center;
+}
+
+.why-value {
+  color: var(--element, var(--text));
+  font-size: 15px;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.why-reason {
+  grid-column: 1 / -1;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------ abertura de pacote */
+
+/*
+ * O visitante rasga a tira serrilhada e a carta aparece atrás. Toda a
+ * coreografia é `clip-path` + `transform`; o React só troca `data-stage`.
+ */
+
+.pack {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: rgb(9 11 15 / 0.92);
+  animation: pack-in 220ms ease both;
+}
+
+/* Sinaliza o fim da sequência para o React desmontar o overlay. */
+.pack[data-stage="opening"] {
+  animation: pack-finish 320ms ease 620ms both;
+}
+
+@keyframes pack-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pack-finish {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.pack-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.pack-wrapper {
+  position: relative;
+  width: 280px;
+  height: 392px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/*
+ * Camada que respira. Separada do botão de propósito: o alvo de clique precisa
+ * ficar imóvel — elemento em movimento perpétuo nunca assenta para automação
+ * nem para quem tem dificuldade motora.
+ */
+.pack-float {
+  position: absolute;
+  inset: 0;
+  display: block;
+  animation: pack-idle 3.4s ease-in-out infinite;
+}
+
+.pack-wrapper:disabled {
+  cursor: default;
+}
+
+.pack-wrapper:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 8px;
+}
+
+/* Respiração de espera: sinaliza que o objeto é interativo sem pedir nada. */
+@keyframes pack-idle {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.pack-body {
+  position: absolute;
+  inset: 34px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(155deg, var(--bg-raised) 0%, var(--bg-sunken) 62%, var(--bg-raised) 100%);
+  border: 1px solid var(--border-strong);
+  border-top: 0;
+  /* Dentes complementares aos da tira, para a costura fechar. */
+  clip-path: polygon(
+    0% 6%, 6% 0%, 14% 6%, 22% 0%, 30% 6%, 38% 0%, 46% 6%, 54% 0%,
+    62% 6%, 70% 0%, 78% 6%, 86% 0%, 94% 6%, 100% 0%, 100% 100%, 0% 100%
+  );
+}
+
+.pack-mark {
+  width: 34px;
+  height: 44px;
+  border-radius: 6px;
+  border: 3px solid var(--accent);
+  background: linear-gradient(160deg, var(--accent) 0 42%, transparent 42%);
+}
+
+.pack-brand {
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.pack-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 46px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(120deg, var(--accent) 0%, #ffe08a 48%, var(--accent) 100%);
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 58%, 94% 100%, 86% 58%, 78% 100%, 70% 58%,
+    62% 100%, 54% 58%, 46% 100%, 38% 58%, 30% 100%, 22% 58%, 14% 100%,
+    6% 58%, 0% 100%
+  );
+  transform-origin: 0% 50%;
+}
+
+/* Luz vazando pela costura, só depois que a tira começa a sair. */
+.pack-glow {
+  position: absolute;
+  top: 26px;
+  left: 8%;
+  right: 8%;
+  height: 120px;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgb(255 255 255 / 0.85),
+    rgb(255 236 170 / 0.35) 42%,
+    transparent 72%
+  );
+}
+
+.pack[data-stage="opening"] .pack-float {
+  animation: none;
+}
+
+.pack[data-stage="opening"] .pack-strip {
+  animation: pack-tear 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.pack[data-stage="opening"] .pack-glow {
+  animation: pack-leak 620ms ease-out both;
+}
+
+.pack[data-stage="opening"] .pack-body {
+  animation: pack-fall 560ms cubic-bezier(0.5, 0, 0.75, 0) 180ms both;
+}
+
+@keyframes pack-tear {
+  to {
+    transform: translate(46%, -128%) rotate(19deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pack-leak {
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scaleY(2.1);
+  }
+}
+
+@keyframes pack-fall {
+  to {
+    transform: translateY(58%) rotate(-4deg);
+    opacity: 0;
+  }
+}
+
+.pack-hint {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.pack[data-stage="opening"] .pack-hint {
+  opacity: 0;
+}
+
+/* Visível desde o primeiro quadro: a animação toca em toda visita (RFC 7.2). */
+.pack-skip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  cursor: pointer;
+}
+
+.pack-skip:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+/*
+ * A regra global de reduced-motion zera `animation-duration`, mas não o
+ * `animation-delay` — sem isto o overlay ficaria parado esperando um atraso que
+ * já não tem animação nenhuma para cobrir.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .pack,
+  .pack * {
+    animation-delay: 0s !important;
+  }
+}
+
+/* --------------------------------------------------------- faixa de apoio */
+
+/*
+ * Fica acima do rodapé, com peso de bloco em vez de link de texto. Nunca entra
+ * na imagem exportada (RFC 9.6) — vive só no site.
+ */
+.support-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin: 8px 0 24px;
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+
+.support-copy h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.3px;
+}
+
+.support-copy p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  max-width: 46ch;
+}
+
+.support-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.support-star {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-sunken);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.support-star:hover {
+  border-color: var(--accent);
+}
+
+.support-star-glyph {
+  color: var(--accent);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.support-star-label {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+/* O número só existe quando a API respondeu; sem ele o rótulo fica sozinho. */
+.support-star-label b {
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 /* -------------------------------------------------------------------- home */
 
 .hero {
@@ -318,6 +674,34 @@ select {
 
 .tilt-card[data-active] .tilt-glare {
   opacity: 1;
+}
+
+/*
+ * Foil especular. Camada por cima do PNG, nunca dentro dele — a imagem exportada
+ * já carrega o seu próprio foil, gerado na build (RFC 7.1, 9.6).
+ *
+ * `screen` faz o preto do filtro desaparecer e só o brilho somar. Fica fraco
+ * parado e acende no hover, porque a luz só existe quando há ponteiro para
+ * movê-la.
+ */
+.tilt-foil {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.28;
+  transition: opacity 240ms ease;
+}
+
+.tilt-card[data-active] .tilt-foil {
+  opacity: 0.75;
+}
+
+.tilt-foil-svg {
+  width: 100%;
+  height: 100%;
 }
 
 /*

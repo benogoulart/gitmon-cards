@@ -127,8 +127,8 @@ describe("recuo a partir de issues abertas (Q5)", () => {
 
 describe("raridade", () => {
   it("premia repositório mantido sobre repositório parado com as mesmas estrelas", () => {
-    // 700★ = 1400 pontos, logo abaixo da faixa holo (1500). O bônus de atividade
-    // é exatamente o que decide entre um tier e outro aqui.
+    // 700★ = 1400 pontos, logo abaixo da faixa double_rare (1500). O bônus de
+    // atividade é exatamente o que decide entre um tier e outro aqui.
     const ativo = buildRepoCard(
       repo({ stargazers_count: 700, pushed_at: "2026-08-09T00:00:00Z" }),
       [],
@@ -139,7 +139,7 @@ describe("raridade", () => {
       [],
       NOW,
     );
-    expect(ativo.rarity).toBe("holo");
+    expect(ativo.rarity).toBe("double_rare");
     expect(parado.rarity).toBe("rare");
   });
 

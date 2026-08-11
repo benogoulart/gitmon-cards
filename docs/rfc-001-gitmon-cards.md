@@ -127,6 +127,21 @@ Dados de origem: `GET /users/{username}` + `GET /users/{username}/repos?per_page
 
 O mapa linguagem→tipo completo e as faixas de raridade exatas estão implementados no protótipo anexo (`github-card-prototype.html`) e podem ser copiados diretamente.
 
+> **Adendo — a escada de raridade desta seção foi substituída.** A fórmula do
+> `score` continua valendo exatamente como está acima. O que mudou foram os
+> tiers: de 5 (`common / uncommon / rare / holo / secret`) para **8**, no padrão
+> do TCG Pokémon (`common / uncommon / rare / double_rare / illustration_rare /
+> ultra_rare / special_illustration_rare / hyper_rare`), com número de série por
+> carta.
+>
+> As faixas **não** vieram do protótipo. A primeira tentativa de escada usou
+> limiares escolhidos como se fossem contagem de estrelas e colocou seis de sete
+> perfis notáveis no tier mais raro — o topo virou o padrão. Os limiares atuais
+> foram calibrados contra perfis reais medidos pela API e estão travados por
+> teste de regressão.
+>
+> Ver `docs/design-system.md`, `lib/cards/rarity.ts` e `tests/unit/rarity.test.ts`.
+
 ### 6.2 Carta de repositório (novo — não existe equivalente no gitfut nem no protótipo)
 
 A definir na sessão de implementação, mas a proposta inicial é:

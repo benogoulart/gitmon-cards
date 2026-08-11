@@ -18,9 +18,20 @@ Origem: `GET /users/{username}` + `GET /users/{username}/repos?per_page=100`
 | Arte | `avatar_url` |
 | Rodapé | bio truncada + ano de criação da conta |
 
-Tiers de raridade: `common / uncommon / rare / holo / secret`.
-**Faixas exatas e o mapa linguagem→elemento completo estão no protótipo** (`reference/github-card-prototype.html`)
-e devem ser transcritos de lá — não reinventados.
+Tiers de raridade (8, no padrão do TCG Pokémon):
+`common / uncommon / rare / double_rare / illustration_rare / ultra_rare /
+special_illustration_rare / hyper_rare`.
+
+As faixas **não** vêm do protótipo: foram calibradas contra perfis reais medidos
+pela API, porque o score cresce muito mais rápido que a intuição (estrelas contam
+×2 e seguidores ×3 — `sindresorhus` dá 1.945.490). A tabela de calibração vive no
+cabeçalho de `lib/cards/rarity.ts` e está travada por
+`tests/unit/rarity.test.ts`. Cada carta também recebe um **número de série**
+sequencial (`lib/cards/serial.ts`).
+
+**O mapa linguagem→elemento completo está no protótipo**
+(`reference/github-card-prototype.html`) e deve ser transcrito de lá — não
+reinventado.
 
 ## Carta de repositório
 
