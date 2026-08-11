@@ -1,5 +1,6 @@
-import type { Derivation } from "@/lib/cards/types";
+import { ELEMENTS, type Derivation, type Element } from "@/lib/cards/types";
 import { translator, type Locale, type MessageKey } from "@/lib/i18n/dictionaries";
+import { TypeIcon } from "./TypeIcon";
 
 /**
  * De onde saiu cada número da carta.
@@ -25,6 +26,19 @@ function localize(
   );
 }
 
+/**
+ * O elemento por trás de um `value` de derivação, quando há um.
+ *
+ * Três das linhas — tipo, fraqueza, resistência — guardam `element.<tipo>`, e
+ * são as únicas que ganham o disco colorido. A checagem contra `ELEMENTS` não é
+ * cerimônia: `value` também carrega `card.none` e `rarity.hyper_rare`, e um
+ * prefixo aceito às cegas viraria um `<img>` apontando para SVG inexistente.
+ */
+function elementOf(value: string): Element | null {
+  const name = value.startsWith("element.") ? value.slice("element.".length) : null;
+  return name && (ELEMENTS as readonly string[]).includes(name) ? (name as Element) : null;
+}
+
 export function StatBreakdown({
   derivations,
   locale,
@@ -45,7 +59,9 @@ export function StatBreakdown({
     <section className="why">
       {heading ? <h2>{t("why.title")}</h2> : null}
       <ul>
-        {derivations.map((item) => (
+        {derivations.map((item) => {
+          const element = elementOf(item.value);
+          return (
           <li key={item.labelKey}>
             <span className="why-label">{t(item.labelKey as MessageKey)}</span>
             {/*
@@ -55,6 +71,7 @@ export function StatBreakdown({
               "250" virar chave inexistente.
             */}
             <strong className="why-value">
+              {element ? <TypeIcon element={element} size={16} /> : null}
               {item.value.includes(".") ? t(item.value as MessageKey) : item.value}
             </strong>
             {/*
@@ -66,7 +83,8 @@ export function StatBreakdown({
               {t(item.reasonKey as MessageKey, localize(item.reasonParams, locale))}
             </span>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );

@@ -318,6 +318,40 @@ select {
   font-weight: 800;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  /*
+   * Flex à direita em vez de `text-align`: com o disco do tipo dentro, alinhar
+   * texto não alinharia a imagem, e o ícone descia da linha de base. Só as três
+   * linhas de elemento têm ícone, e as outras quatro continuam onde estavam
+   * porque `justify-content: flex-end` faz o mesmo que `text-align: right` para
+   * um filho só.
+   */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/*
+ * Os SVGs são discos redondos com glifo branco (o mesmo arquivo de onde a cor
+ * base do tipo foi extraída). `flex: none` porque num nome longo — "Rara
+ * Ilustrada Especial" ao lado de um tipo — o flex do pai espremeria o disco em
+ * elipse antes de quebrar a linha.
+ */
+.type-icon {
+  flex: none;
+  display: inline-block;
+  vertical-align: -0.15em;
+}
+
+/*
+ * O tipo, na linha sob o nome da carta. `inline-flex` mantém o disco colado ao
+ * nome do tipo quando a linha quebra: sem ele, o ícone pode terminar sozinho no
+ * fim de uma linha e o nome começar na seguinte.
+ */
+.headline-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .why-reason {
@@ -857,6 +891,13 @@ select {
 .card-aside-left .why-value {
   order: 1;
   text-align: left;
+  /*
+   * A coluna esquerda é espelhada: o valor vai para a borda de fora, longe do
+   * rótulo. Desde que `.why-value` virou flex (para o disco do tipo assentar na
+   * linha), `text-align` sozinho não move mais nada — sem esta linha o valor
+   * cola no rótulo e o espelho se desfaz.
+   */
+  justify-content: flex-start;
 }
 
 /* `order` reordena todos os itens do grid: sem isto o motivo sobe para cima do
@@ -896,6 +937,7 @@ select {
   .card-aside-left .why-value {
     order: 0;
     text-align: right;
+    justify-content: flex-end;
   }
 }
 

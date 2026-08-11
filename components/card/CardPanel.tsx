@@ -8,6 +8,7 @@ import { PackOpening } from "./PackOpening";
 import { RadarChart } from "./RadarChart";
 import { StatBreakdown } from "./StatBreakdown";
 import { TiltCard } from "./TiltCard";
+import { TypeIcon } from "./TypeIcon";
 
 /**
  * A carta em si, com o que uma pessoa precisa depois de gerá-la: o snippet para
@@ -69,8 +70,12 @@ export function CardPanel({
         <div className="card-headline">
           <h1>{card.name}</h1>
           <p>
-            {t(rarityKey(card.rarity))} · {t(elementKey(card.element))} ·{" "}
-            {t(card.kind === "profile" ? "card.profile" : "card.repo")}
+            {t(rarityKey(card.rarity))} ·{" "}
+            <span className="headline-type">
+              <TypeIcon element={card.element} size={16} />
+              {t(elementKey(card.element))}
+            </span>{" "}
+            · {t(card.kind === "profile" ? "card.profile" : "card.repo")}
           </p>
         </div>
       </div>
