@@ -105,6 +105,12 @@ export interface Card {
   stats: CardStat[];
   /** Explicação de cada valor derivado. Só o site usa; a imagem, não. */
   derivations?: Derivation[];
+  /**
+   * Assinatura do perfil para o radar. Como `derivations`, é afordância do site
+   * e não entra na imagem exportada. Ver `./ratings.ts` para por que isto é
+   * silhueta e não medição.
+   */
+  ratings?: AxisRating[];
   /** Link para a origem no GitHub. */
   sourceUrl: string;
 }
@@ -130,6 +136,8 @@ export interface Derivation {
   /** Substituições da frase de motivo. */
   reasonParams?: Record<string, string | number>;
 }
+
+import type { AxisRating } from "./ratings";
 
 export interface CardStat {
   /** Chave do dicionário i18n, não o rótulo já traduzido. */

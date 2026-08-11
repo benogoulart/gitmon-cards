@@ -5,6 +5,7 @@ import { absoluteUrl } from "@/lib/config";
 import { elementKey, rarityKey, translator, type Locale } from "@/lib/i18n/dictionaries";
 import { CopyField } from "@/components/ui/CopyField";
 import { PackOpening } from "./PackOpening";
+import { RadarChart } from "./RadarChart";
 import { StatBreakdown } from "./StatBreakdown";
 import { TiltCard } from "./TiltCard";
 
@@ -60,6 +61,10 @@ export function CardPanel({
             </div>
           ))}
         </dl>
+
+        {card.ratings && card.ratings.length > 0 ? (
+          <RadarChart ratings={card.ratings} locale={locale} />
+        ) : null}
 
         {card.derivations && card.derivations.length > 0 ? (
           <StatBreakdown derivations={card.derivations} locale={locale} />

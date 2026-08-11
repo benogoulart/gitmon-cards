@@ -12,6 +12,7 @@ import {
 } from "./format";
 import { elementKey, rarityKey } from "../i18n/dictionaries";
 import { rarityForScore } from "./rarity";
+import { ratingsFor } from "./ratings";
 import type { Attack, Card, Element } from "./types";
 
 /**
@@ -86,6 +87,13 @@ export function buildProfileCard(
       // String, não número: ano formatado como número vira "2.011".
       { labelKey: "stat.since", value: String(year(user.created_at)) },
     ],
+    ratings: ratingsFor({
+      stars: totalStars,
+      followers: user.followers,
+      repos: user.public_repos,
+      years: accountAge,
+      languages: languages.length,
+    }),
     derivations: [
       {
         labelKey: "card.type",

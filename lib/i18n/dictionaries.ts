@@ -102,6 +102,14 @@ const pt = {
   "card.attacks": "Ataques",
   "card.rarityLabel": "Raridade",
 
+  "radar.title": "Assinatura do perfil",
+  "radar.caption": "Forma comparativa, não medição — os números exatos estão ao lado.",
+  "axis.reach": "Alcance",
+  "axis.community": "Comunidade",
+  "axis.volume": "Volume",
+  "axis.veterancy": "Veterania",
+  "axis.breadth": "Amplitude",
+
   "why.title": "De onde saem estes números",
   "why.element": "Sua linguagem dominante é {language}, ponderada por estrelas.",
   "why.element.none": "Nenhuma linguagem identificada nos seus repositórios próprios.",
@@ -212,6 +220,14 @@ const en: Record<MessageKey, string> = {
   "card.type": "Type",
   "card.attacks": "Attacks",
   "card.rarityLabel": "Rarity",
+
+  "radar.title": "Profile signature",
+  "radar.caption": "Comparative shape, not measurement — exact numbers are alongside.",
+  "axis.reach": "Reach",
+  "axis.community": "Community",
+  "axis.volume": "Volume",
+  "axis.veterancy": "Veterancy",
+  "axis.breadth": "Breadth",
 
   "why.title": "Where these numbers come from",
   "why.element": "Your dominant language is {language}, weighted by stars.",
