@@ -1,0 +1,52 @@
+# dependências
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# build
+.next/
+out/
+build/
+dist/
+
+# ambiente
+.env
+.env*.local
+.env.production
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# testes
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# material de referência clonado (consulta, não código nosso)
+/reference/gitfut/
+/reference/trading-card-generator/
+/reference/pokemon-card-generator/
+
+# rascunhos de arte — só o asset final versionado
+/public/assets/**/*.psd
+/public/assets/**/*.ai
+/public/assets/**/*.sketch
+/public/assets/**/*.fig
+
+# sistema
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+.vscode/*
+!.vscode/extensions.json
