@@ -49,7 +49,7 @@ export async function renderCard(card: Card, locale: Locale): Promise<ImageRespo
       avatarUri(card.artUrl, art.width),
       energyUri(card.element),
       retreatUri(),
-      hasFoil(card.rarity) ? foilUri(card.rarity) : Promise.resolve(null),
+      hasFoil(card.rarity) ? foilUri(card.rarity, treatment.fullArt) : Promise.resolve(null),
       treatment.metal ? metalUri(treatment.metal) : Promise.resolve(null),
       card.weakness ? energyUri(card.weakness) : Promise.resolve(null),
       card.resistance ? energyUri(card.resistance) : Promise.resolve(null),

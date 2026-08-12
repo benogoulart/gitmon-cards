@@ -243,79 +243,263 @@ export function retreatSvg(size = 48) {
 </svg>`;
 }
 
-/**
- * Perfil de foil por tier.
+/*
+ * ---------------------------------------------------------------------------
+ * Foil
+ * ---------------------------------------------------------------------------
  *
- * `gain` multiplica a opacidade de tudo; as bandas dão a temperatura. A escada
- * vai de holográfico frio e discreto na `rare` até dourado saturado na
- * `hyper_rare`, para que a diferença entre tiers altos seja legível mesmo quando
- * a arte por baixo é a mesma.
- *
- * `ultra_rare` foge do arco-íris de propósito: no TCG ela é full-art texturizada
- * prateada, e prata só lê como prata se não competir com as outras cores.
+ * O perfil de cada tier **não** mora aqui: está em `lib/cards/foil.json`, que é
+ * lido tanto por `scripts/build-assets.mjs` quanto por `lib/cards/rarity.ts`.
+ * Antes havia duas escadas — um `gain` de 0.7 a 1.65 neste arquivo e um
+ * `foilIntensity()` de 0.42 a 1 no runtime — que descreviam a mesma coisa com
+ * números diferentes e podiam divergir sem que nada quebrasse.
  */
-const FOIL = {
-  rare: { gain: 0.7, bands: ["#8FD9FF", "#D9A8FF", "#A8FFD1", "#FFE9A8"] },
-  double_rare: { gain: 0.95, bands: ["#8FD9FF", "#D9A8FF", "#A8FFD1", "#FFE9A8"] },
-  illustration_rare: { gain: 1.15, bands: ["#FFE9A8", "#FFC98F", "#D9A8FF", "#8FD9FF"] },
-  ultra_rare: { gain: 1.3, bands: ["#E8EEF5", "#C8CDD4", "#F2F6FA", "#D6DEE8"] },
-  special_illustration_rare: {
-    gain: 1.45,
-    bands: ["#FFD76A", "#FF8FD0", "#7FE7FF", "#FFF3B0"],
-  },
-  hyper_rare: { gain: 1.65, bands: ["#FFD76A", "#FFC02E", "#FFE9A8", "#FFB347"] },
-};
 
-export const FOIL_TIERS = Object.keys(FOIL);
+/**
+ * Ruído anisotrópico: linhas, não chuvisco.
+ *
+ * 0.006 na horizontal contra 0.085 na vertical estica o ruído em faixas de ~12px
+ * de período — o padrão do foil linear do TCG. Ruído isotrópico nesta escala lê
+ * como chuvisco de televisão, não como metal escovado. Os mesmos números e as
+ * mesmas sementes alimentam o relevo e a máscara do espectro, e é isso que faz a
+ * cor viver **nas cristas** em vez de flutuar por cima delas como um segundo
+ * adesivo.
+ */
+const GRAIN_FREQUENCY = "0.003 0.22";
+const WAVE_FREQUENCY = "0.007";
+const DISPLACE_SCALE = 6;
+
+/**
+ * Curva de resposta do relevo, amostrada em seis pontos (`feFuncA type="table"`).
+ *
+ * Convexa de propósito: `t^1.7` esmaga o meio da faixa e preserva o topo, então
+ * a luz sai como cintilância nas cristas em vez de véu branco sobre a carta
+ * inteira. Uma rampa linear com ganho suficiente para as cristas aparecerem
+ * levantava o fundo junto e enevoava o texto impresso — que é exatamente o risco
+ * registrado no plano do revamp.
+ */
+const RELIEF_CURVE = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => t ** 2.4);
+
+/** Quantas vezes o ciclo de bandas se repete ao longo da diagonal. */
+const SPECTRAL_SWEEPS = 2.5;
+
+/**
+ * Quanto do relevo sobrevive dentro da janela da arte.
+ *
+ * A primeira versão aplicava as quatro camadas uniformemente na carta inteira, e
+ * o resultado foi o risco que o plano do revamp já previa: sobre o avatar o
+ * relevo vira névoa de linhas brancas e o rosto some. Não é problema de
+ * intensidade — em qualquer força que leia como foil, um retrato por baixo é
+ * apagado.
+ *
+ * O que fica atenuado é só o **relevo e o granulado**, que somam luz branca e
+ * comem detalhe. O espectro e a lâmina atravessam a janela inteiros: cor sobre
+ * foto ainda lê como holográfico e não destrói contorno. É, aliás, o que a carta
+ * de verdade faz — o brilho que atravessa a ilustração é colorido, e o grão
+ * metálico vive na superfície ao redor dela.
+ */
+const ART_WINDOW_RELIEF = 0.26;
 
 /**
  * Camada de foil, aplicada por cima da moldura nos seis tiers a partir de `rare`
  * (RFC 8, caminho C). No TCG a Rare já vem com holográfico básico, por isso o
  * corte não é mais só nos dois tiers do topo.
  *
- * Tudo aqui é alpha — nenhum pixel opaco, nenhum preto. O Satori compõe imagem
- * com alpha simples e não tem `mix-blend-mode`: qualquer área escura viraria véu
- * cinza por cima da carta em vez de brilho. O efeito precisa nascer transparente.
+ * São quatro camadas, e cada uma existe por um motivo distinto — as mesmas
+ * quatro da pilha ao vivo em `components/card/TiltCard.tsx`, congeladas num
+ * ângulo fixo:
+ *
+ *   relevo     ruído anisotrópico aceso por uma luz especular parada
+ *   espectro   faixas de cor mascaradas pelo mesmo ruído, varrendo a diagonal
+ *   lâmina     o reflexo duro da fonte de luz, atravessando a carta
+ *   granulado  poeira fina por cima, para nada ler como gradiente
+ *
+ * A luz é **estática**, e é `feDistantLight` e não `fePointLight`: a imagem
+ * exportada não anima (`docs/decisions.md`), então o que a versão ao vivo obtém
+ * movendo a luz aqui se obtém escolhendo um ângulo e congelando nele. Luz
+ * pontual foi tentada primeiro e ilumina o grão só em volta do ponto — as linhas
+ * apareciam num terço da carta e sumiam no resto. Luz distante não tem posição,
+ * só direção, então o grão fica parelho de borda a borda; o ponto quente que ela
+ * não dá é justamente o trabalho da lâmina, que é uma camada separada.
+ *
+ * Com `fullArt`, a atenuação da janela cobre quase a carta inteira, e é por isso
+ * que existe um PNG por variante: `foil-<tier>.png` e `fullart-foil-<tier>.png`,
+ * na mesma convenção das molduras.
+ *
+ * Tudo continua sendo alpha — nenhum pixel opaco, nenhum preto. O Satori compõe
+ * imagem com alpha simples e não tem `mix-blend-mode`: qualquer área escura
+ * viraria véu cinza por cima da carta em vez de brilho. Por isso o granulado
+ * nasce de `luminanceToAlpha` (que devolve preto com alpha variável) e é
+ * imediatamente recolorido de branco por um `feFlood` + `feComposite operator="in"`
+ * — o que sobra do ruído é só a máscara dele.
  */
-export function foilSvg(layout, tier) {
+export function foilSvg(layout, profile, { fullArt = false } = {}) {
   const { width: W, height: H, radius: R } = layout;
+  const win = fullArt ? layout.fullArt.window : layout.window;
 
-  const profile = FOIL[tier];
-  if (!profile) {
-    throw new Error(`Tier sem perfil de foil: ${tier}`);
+  const { intensity, bands } = profile ?? {};
+  if (typeof intensity !== "number" || !Array.isArray(bands) || bands.length === 0) {
+    throw new Error(`Perfil de foil inválido: ${JSON.stringify(profile)}`);
   }
-  const { gain, bands } = profile;
 
-  const stops = bands
-    .map((color, i) => {
-      const offset = (i / (bands.length - 1)).toFixed(3);
-      return `<stop offset="${offset}" stop-color="${color}" stop-opacity="${(0.13 * gain).toFixed(3)}"/>`;
-    })
-    .join("\n      ");
+  /** Cinza opaco cujo valor de luminância é o fator de atenuação da máscara. */
+  const attenuation = Math.round(ART_WINDOW_RELIEF * 255)
+    .toString(16)
+    .padStart(2, "0")
+    .repeat(3);
 
-  /** Uma faixa de luz: transparente → clara → transparente. */
-  const streak = (center, width, peak) =>
+  /*
+   * Uma escada só. `intensity` vem de `foil.json` (0.42 na `rare`, 1 na
+   * `hyper_rare`) e multiplica as quatro camadas, então subir um tier clareia o
+   * foil impresso e o foil ao vivo na mesma proporção.
+   */
+  const reliefAmplitude = 1.4 + 1.8 * intensity;
+  const reliefTable = RELIEF_CURVE.map((v) => Math.min(1, v * reliefAmplitude).toFixed(4)).join(" ");
+
+  const spectralStops = spectral(bands, intensity);
+
+  /** Uma lâmina de luz: transparente → clara → transparente. */
+  const blade = (center, halfWidth, peak) =>
     [
-      `<stop offset="${Math.max(0, center - width).toFixed(3)}" stop-color="#FFFFFF" stop-opacity="0"/>`,
-      `<stop offset="${center.toFixed(3)}" stop-color="#FFFFFF" stop-opacity="${(peak * gain).toFixed(3)}"/>`,
-      `<stop offset="${Math.min(1, center + width).toFixed(3)}" stop-color="#FFFFFF" stop-opacity="0"/>`,
+      `<stop offset="${clamp01(center - halfWidth).toFixed(3)}" stop-color="#FFFFFF" stop-opacity="0"/>`,
+      `<stop offset="${clamp01(center).toFixed(3)}" stop-color="#FFFFFF" stop-opacity="${(peak * intensity).toFixed(3)}"/>`,
+      `<stop offset="${clamp01(center + halfWidth).toFixed(3)}" stop-color="#FFFFFF" stop-opacity="0"/>`,
     ].join("\n      ");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
-    <linearGradient id="arco" x1="0" y1="1" x2="1" y2="0">
-      ${stops}
+    <!--
+      Relevo especular. A região do filtro sobra 10% para cada lado porque o
+      feDisplacementMap empurra pixels para fora da caixa: com a região justa a
+      ondulação some cortada nas quatro bordas, que é justamente onde a moldura
+      está.
+    -->
+    <filter id="relevo" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="${GRAIN_FREQUENCY}" numOctaves="3" seed="7" result="grao"/>
+      <feTurbulence type="turbulence" baseFrequency="${WAVE_FREQUENCY}" numOctaves="2" seed="3" result="onda"/>
+      <feDisplacementMap in="grao" in2="onda" scale="${DISPLACE_SCALE}" xChannelSelector="R" yChannelSelector="G" result="ondulado"/>
+      <feColorMatrix in="ondulado" type="luminanceToAlpha" result="altura"/>
+      <feSpecularLighting in="altura" surfaceScale="4" specularConstant="0.9" specularExponent="22"
+                          lighting-color="#FFFFFF" result="luz">
+        <feDistantLight azimuth="250" elevation="52"/>
+      </feSpecularLighting>
+      <feComposite in="luz" in2="altura" operator="in" result="cristas"/>
+      <feComponentTransfer in="cristas">
+        <feFuncA type="table" tableValues="${reliefTable}"/>
+      </feComponentTransfer>
+    </filter>
+
+    <!--
+      Máscara do espectro: o mesmo ruído, em tom de cinza, comprimido em
+      0.42..1. O piso não é zero de propósito — a cor precisa existir no vale
+      também, senão o espectro vira listra em vez de superfície.
+    -->
+    <filter id="cristas" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="${GRAIN_FREQUENCY}" numOctaves="3" seed="7" result="grao"/>
+      <feTurbulence type="turbulence" baseFrequency="${WAVE_FREQUENCY}" numOctaves="2" seed="3" result="onda"/>
+      <feDisplacementMap in="grao" in2="onda" scale="${DISPLACE_SCALE}" xChannelSelector="R" yChannelSelector="G" result="ondulado"/>
+      <feColorMatrix in="ondulado" type="luminanceToAlpha" result="altura"/>
+      <feFlood flood-color="#FFFFFF" result="branco"/>
+      <feComposite in="branco" in2="altura" operator="in" result="linhas"/>
+      <feComponentTransfer in="linhas">
+        <feFuncA type="linear" slope="0.58" intercept="0.42"/>
+      </feComponentTransfer>
+    </filter>
+    <mask id="linhas">
+      <rect x="0" y="0" width="${W}" height="${H}" filter="url(#cristas)"/>
+    </mask>
+
+    <!--
+      Superfície: tudo menos a janela da arte. A borda é desfocada porque um
+      degrau seco na intensidade do foil bem na moldura da janela lê como defeito
+      de impressão, e não como o brilho passando por baixo da ilustração.
+    -->
+    <filter id="suavizar">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <mask id="superficie">
+      <rect x="0" y="0" width="${W}" height="${H}" fill="#FFFFFF"/>
+      <rect x="${win.x}" y="${win.y}" width="${win.width}" height="${win.height}" rx="${win.radius}"
+            fill="#${attenuation}" filter="url(#suavizar)"/>
+    </mask>
+
+    <!--
+      Granulado: ruído fino, recolorido de branco. A frequência é 0.5 e não 0.7
+      porque a 0.7 o grão tem ~1px e some no reamostramento de qualquer
+      visualização abaixo de 100% — pagava 80 KB por camada invisível.
+    -->
+    <filter id="granulado" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="1" seed="11" result="poeira"/>
+      <feColorMatrix in="poeira" type="luminanceToAlpha" result="alfa"/>
+      <feComponentTransfer in="alfa" result="esparso">
+        <feFuncA type="table" tableValues="0 ${(0.09 * intensity).toFixed(3)} ${(0.26 * intensity).toFixed(3)} ${(0.52 * intensity).toFixed(3)}"/>
+      </feComponentTransfer>
+      <feFlood flood-color="#FFFFFF" result="branco"/>
+      <feComposite in="branco" in2="esparso" operator="in"/>
+    </filter>
+
+    <!--
+      Espectro. As bandas se repetem ${SPECTRAL_SWEEPS} vezes ao longo da
+      diagonal em vez de uma só: no foil linear de verdade o matiz volta várias
+      vezes na mesma carta, e um único arco de quatro paradas lê como gradiente
+      de fundo de site.
+    -->
+    <linearGradient id="espectro" x1="0" y1="1" x2="1" y2="0">
+      ${spectralStops}
     </linearGradient>
-    <linearGradient id="varredura" x1="0" y1="1" x2="1" y2="0">
+
+    <linearGradient id="lamina" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
-      ${streak(0.34, 0.09, 0.26)}
-      ${streak(0.6, 0.06, 0.16)}
+      ${blade(0.38, 0.24, 0.08)}
+      ${blade(0.38, 0.045, 0.3)}
+      ${blade(0.67, 0.022, 0.17)}
       <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
     </linearGradient>
+
+    <!-- Os filtros substituem o desenho do elemento inteiro e ignoram o rx;
+         quem devolve o canto arredondado da carta é este recorte. -->
+    <clipPath id="carta">
+      <rect x="0" y="0" width="${W}" height="${H}" rx="${R}"/>
+    </clipPath>
   </defs>
-  <rect x="0" y="0" width="${W}" height="${H}" rx="${R}" fill="url(#arco)"/>
-  <rect x="0" y="0" width="${W}" height="${H}" rx="${R}" fill="url(#varredura)"/>
+
+  <!-- Na ordem das quatro camadas. Relevo e granulado recuam sobre a arte
+       (mask superficie); espectro e lâmina atravessam a janela inteiros. -->
+  <g clip-path="url(#carta)">
+    <g mask="url(#superficie)">
+      <rect x="0" y="0" width="${W}" height="${H}" filter="url(#relevo)"/>
+    </g>
+    <g mask="url(#linhas)">
+      <rect x="0" y="0" width="${W}" height="${H}" fill="url(#espectro)"/>
+    </g>
+    <rect x="0" y="0" width="${W}" height="${H}" fill="url(#lamina)"/>
+    <g mask="url(#superficie)">
+      <rect x="0" y="0" width="${W}" height="${H}" filter="url(#granulado)"/>
+    </g>
+  </g>
 </svg>`;
+}
+
+/**
+ * Paradas do gradiente espectral.
+ *
+ * A opacidade oscila junto com a repetição das bandas: ciclos alternados chegam
+ * mais fortes que os vizinhos. Sem essa onda a repetição vira papel de parede —
+ * o olho encontra o período e o efeito deixa de ler como reflexo.
+ */
+function spectral(bands, intensity) {
+  const count = Math.round(bands.length * SPECTRAL_SWEEPS);
+
+  return Array.from({ length: count + 1 }, (_, i) => {
+    const t = i / count;
+    const wave = 0.6 + 0.4 * Math.sin(t * Math.PI * 1.7 + 0.5);
+    const opacity = 0.46 * intensity * wave;
+    return `<stop offset="${t.toFixed(3)}" stop-color="${bands[i % bands.length]}" stop-opacity="${opacity.toFixed(3)}"/>`;
+  }).join("\n      ");
+}
+
+function clamp01(value) {
+  return Math.min(1, Math.max(0, value));
 }
 
 export const GLYPH_KEYS = Object.keys(GLYPHS);

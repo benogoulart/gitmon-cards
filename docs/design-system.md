@@ -109,6 +109,27 @@ O corte de `double_rare` em 1500 é uma **restrição, não uma preferência**: 
 
 Os tiers acima de `double_rare` foram calibrados contra perfis reais medidos pela API. O score cresce muito mais rápido que a intuição, porque estrelas contam ×2 e seguidores ×3: `torvalds` dá 1.456.179 e `sindresorhus`, 1.945.490. Uma escada que parasse em 25.000 colocaria todo dev conhecido no tier mais raro.
 
+### Foil
+
+Uma escada só, em `lib/cards/foil.json`, lida pelas duas pontas: `foilIntensity()` a multiplica nas opacidades do CSS ao vivo, e `foilSvg()` a multiplica nas quatro camadas do PNG assado. Antes eram dois conjuntos de números descrevendo a mesma coisa.
+
+`0.42` rare · `0.55` double_rare · `0.78` illustration_rare · `0.88` ultra_rare · `0.95` special_illustration_rare · `1` hyper_rare. Não é linear: o salto grande fica onde o tratamento também vira full-art.
+
+Quatro camadas, na mesma ordem nos dois foils:
+
+| Camada | O que é | Como é feita no PNG |
+|---|---|---|
+| relevo | grão metálico escovado | `feTurbulence` anisotrópico (`0.003 0.22`) + `feDisplacementMap` + `feSpecularLighting` |
+| espectro | a cor que varre a diagonal | gradiente das 4 bandas do tier, repetido 2,5×, mascarado pelo **mesmo** ruído |
+| lâmina | o reflexo duro da luz | gradiente diagonal, um pico estreito e um largo |
+| granulado | poeira fina, contra o aspecto de gradiente | `feTurbulence` a `0.5` recolorido de branco |
+
+A luz do PNG é `feDistantLight` (azimute `250`, elevação `52`), não pontual: luz pontual ilumina o grão só em volta do ponto e as linhas somem em dois terços da carta. O ponto quente que ela não dá é o trabalho da lâmina.
+
+**Relevo e granulado recuam a 26% dentro da janela da arte**, com a borda desfocada em 7px; espectro e lâmina atravessam a janela inteiros. Luz branca sobre um retrato apaga o rosto, cor sobre um retrato não. Daí haver duas variantes por tier — `foil-<tier>.png` e `fullart-foil-<tier>.png` — como já havia para as molduras.
+
+Tudo é alpha, nenhum pixel opaco e nenhum preto: o Satori não tem `mix-blend-mode` e qualquer área escura viraria véu cinza. O foil é o único asset gravado como PNG indexado (256 cores): ruído de baixo contraste cabe em 230 KB em vez de 780 KB sem diferença visível, e nas molduras a mesma quantização faria faixas nos gradientes largos.
+
 ## Número de série
 
 `#0042`, zero-padded em quatro dígitos, ao lado do símbolo no rodapé direito. Sequencial por ordem de geração, atribuído na primeira vez e imutável depois. Ausente quando não há store durável — nunca inventado localmente.

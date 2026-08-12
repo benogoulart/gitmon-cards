@@ -1,3 +1,4 @@
+import foil from "./foil.json";
 import type { Rarity } from "./types";
 
 /**
@@ -140,38 +141,29 @@ export function hasFoil(rarity: Rarity): boolean {
   return rarity !== "common" && rarity !== "uncommon";
 }
 
+/*
+ * A anotação de tipo é o que dá exaustividade a uma tabela que vem de JSON: um
+ * tier novo em `types.ts` sem a linha correspondente em `foil.json` deixa de
+ * compilar aqui, no lugar de devolver `undefined` e apagar o foil em silêncio.
+ * É a mesma garantia que o `switch` dava antes de a escada virar arquivo.
+ */
+const FOIL_INTENSITY: Record<Rarity, number> = foil.intensity;
+
 /**
- * Força do foil ao vivo, de 0 a 1 (`components/card/TiltCard.tsx`).
+ * Força do foil, de 0 a 1.
  *
- * O `hasFoil` acima é booleano porque a moldura impressa só precisa saber se
- * existe arquivo de foil para compor. Na tela é diferente: seis tiers dividindo
- * a mesma camada faz `rare` e `hyper_rare` brilharem igual, e a escada de
- * raridade que o resto da carta constrói morre exatamente no efeito mais
- * visível dela.
+ * O `hasFoil` acima é booleano porque a composição só precisa saber se existe
+ * arquivo de foil. A intensidade é outra coisa: seis tiers dividindo a mesma
+ * camada faz `rare` e `hyper_rare` brilharem igual, e a escada de raridade que o
+ * resto da carta constrói morre exatamente no efeito mais visível dela.
  *
- * Os valores não são lineares. O salto grande fica entre `double_rare` e
- * `illustration_rare`, que é onde o tratamento também muda para full-art
- * (`cardTreatment`) — o foil acompanha o degrau que já existe em vez de
- * inventar outro.
+ * Vale para os **dois** foils. `components/card/TiltCard.tsx` multiplica este
+ * número nas opacidades do CSS, e `scripts/build-assets.mjs` multiplica o mesmo
+ * número nas quatro camadas do PNG assado (`foilSvg`). Antes eram duas escadas
+ * paralelas com números diferentes; ver o `_comment` de `foil.json`.
  */
 export function foilIntensity(rarity: Rarity): number {
-  switch (rarity) {
-    case "common":
-    case "uncommon":
-      return 0;
-    case "rare":
-      return 0.42;
-    case "double_rare":
-      return 0.55;
-    case "illustration_rare":
-      return 0.78;
-    case "ultra_rare":
-      return 0.88;
-    case "special_illustration_rare":
-      return 0.95;
-    case "hyper_rare":
-      return 1;
-  }
+  return FOIL_INTENSITY[rarity];
 }
 
 export type MetalTone = "silver" | "gold";

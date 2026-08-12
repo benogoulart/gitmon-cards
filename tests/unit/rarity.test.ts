@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import foil from "@/lib/cards/foil.json";
 import {
   cardTreatment,
   foilIntensity,
@@ -166,6 +167,24 @@ describe("intensidade do foil ao vivo", () => {
     for (const rarity of RARITIES) {
       expect(foilIntensity(rarity)).toBeGreaterThanOrEqual(0);
       expect(foilIntensity(rarity)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  /*
+   * `foil.json` é a fonte única das duas pontas: o `foilIntensity()` que o
+   * TiltCard multiplica no CSS e o `foilSvg()` que a build assa em PNG. As duas
+   * pontas divergirem não quebra compilação nenhuma — dá carta sem foil de um
+   * lado ou arquivo órfão do outro, e o sintoma só aparece na imagem. Daí o
+   * teste ser sobre o arquivo, e não sobre a função.
+   */
+  it("tem uma banda espectral por tier com foil, e só por esses", () => {
+    expect(Object.keys(foil.bands).sort()).toEqual(RARITIES.filter(hasFoil).sort());
+  });
+
+  it("dá quatro cores a cada banda — é o ciclo que o gradiente repete", () => {
+    for (const [tier, bands] of Object.entries(foil.bands)) {
+      expect(bands, tier).toHaveLength(4);
+      for (const color of bands) expect(color, tier).toMatch(/^#[0-9A-F]{6}$/i);
     }
   });
 });
