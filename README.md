@@ -43,6 +43,11 @@ pacote, foil especular seguindo o ponteiro, radar de assinatura do perfil e um p
 derivações mostrando de onde cada número saiu. O PNG que viaja para o README de outra pessoa
 continua limpo.
 
+E fala a língua da carta em vez de ser um invólucro em volta dela: display e títulos usam a
+**mesma face** que o Satori desenha na carta (M PLUS Rounded 1c, 28 KB em dois pesos WOFF2), e o
+tipo da carta tinge a superfície da página inteira — 7% no fundo das caixas, 22% nas bordas. Uma
+página de Fogo e uma de Água já não são a mesma página cinza com duas palavras trocadas.
+
 ## Levar a carta embora
 
 Três saídas, para três destinos:
@@ -84,7 +89,7 @@ embutida no README de alguém, não é. Em produção o Redis é obrigatório (R
 | `npm run test:e2e` | Playwright (precisa de `npx playwright install chromium`) |
 | `PREVIEW=<dir> npm test` | Grava os PNGs renderizados em disco para inspeção visual |
 | `npm run assets` | Regenera molduras, foil, metal e ícones de energia |
-| `npm run fonts` | Baixa e subseta a fonte da carta |
+| `npm run fonts` | Baixa e subseta a fonte da carta — TTF para o Satori, WOFF2 para o site |
 
 No PowerShell, a variável de preview vai antes, separada: `$env:PREVIEW="out"; npm test`.
 
@@ -157,7 +162,7 @@ lib/
 
 scripts/
   build-assets.mjs             gera moldura, full-art, foil, metal e energia (SVG → PNG)
-  build-fonts.mjs              baixa e subseta a fonte da carta
+  build-fonts.mjs              baixa e subseta a fonte da carta (TTF + WOFF2)
   assets/types/                os 18 ícones de tipo, entrada de build — não gerados por código
   lib/art.mjs                  as primitivas de desenho usadas pelo build
 

@@ -49,18 +49,55 @@ diretamente na interface (`components/card/TypeIcon.tsx`) — no nome do tipo so
 carta e nas linhas de tipo, fraqueza e resistência do painel de explicação.
 Sempre decorativos: o nome do tipo está escrito ao lado.
 
+### O tipo como superfície
+
+`--element` existia no painel inteiro e mesmo assim a página de uma carta de Fogo
+e a de uma de Água só diferiam em algumas palavras de 13px e na auréola atrás da
+carta. Todas as caixas e bordas eram o mesmo cinza-azulado nas duas.
+
+A correção é a mesma que a carta recebeu na escada de raridade: **tingir a
+superfície, não pintar mais texto.**
+
+| Token | Fórmula | Onde |
+|---|---|---|
+| `--surface-tint` | `7%` do tipo sobre `--bg-raised` | derivações, botões de compartilhar, lista de repositórios |
+| `--border-tint` | `22%` do tipo sobre `--border` | as bordas dessas mesmas caixas e o campo de embed |
+
+Mais o trilho de `2px` na borda de dentro de cada derivação (`inset box-shadow`),
+que é o bloco mais repetido da página, e o anel de foco do formulário de batalha
+— dentro do painel quem manda é o tipo; o amarelo da marca fica para a home.
+
+7% numa caixa não lê como "caixa colorida", lê como a página inteira ter
+temperatura. Uma página morna contra uma fria se vê antes de qualquer palavra.
+
+**Os dois tokens são declarados em `:root`, `.card-panel` e `.repo-list`, e a
+repetição é necessária:** um custom property que referencia outro é substituído
+no elemento onde é *declarado*, não onde é usado. Declarado só em `:root`, o
+`var(--element)` de dentro dele resolveria para o `--element` do `:root` — que
+não existe — e o valor já resolvido desceria por herança. Um bloco novo com
+`--element` próprio precisa entrar nessa lista.
+
 ## Tipografia
 
-Stack de sistema (`ui-sans-serif, system-ui, …`) e mono de sistema. **Nenhuma webfont.** Base `16px`, `line-height 1.55`.
+**Duas faces, por papel.** Display e título na face da carta; corpo, UI e mono na stack de sistema. Base `16px`, `line-height 1.55`.
 
-| Papel | Tamanho | Peso | Tracking |
-|---|---|---|---|
-| Hero h1 | `clamp(30px, 5vw, 44px)` | — | `-1px` |
-| Card h1 | `34px` | — | `-0.8px` |
-| Stat value | `22px` | 800 | — |
-| Section h2 | `13px` uppercase | — | `1.2px` |
-| Corpo | `14–17px` | — | — |
-| Meta | `12–12.5px` | — | — |
+`--font-display` é **M PLUS Rounded 1c** — a mesma que o Satori desenha dentro da carta, não uma fonte nova. Sem ela o site parecia um invólucro genérico em volta da carta em vez da mesma peça continuando.
+
+O custo é deliberado e delimitado: dois pesos (`700` e `900`), em WOFF2 subsetado, **28 KB no total**. Não há texto de 400 na face aqui, então o Regular não recebe WOFF2 — `scripts/build-fonts.mjs` marca com `web: true` os pesos que o site usa. WOFF2 é o mesmo TTF comprimido com Brotli e custa um terço dele; o Satori continua lendo o TTF, que é o único formato que ele entende.
+
+`font-display: swap`, e os dois pesos com `<link rel="preload">` no `layout.tsx`: a face aparece no primeiro texto visível de toda página (a marca e o título logo abaixo), então sem preload ela só é descoberta depois do CSS e a troca acontece com a página já lida.
+
+| Papel | Face | Tamanho | Peso | Tracking |
+|---|---|---|---|---|
+| Hero h1 | display | `clamp(30px, 5vw, 44px)` | — | `-1px` |
+| Card h1 | display | `34px` | — | `-0.8px` |
+| Marca | display | `19px` | 800 | `-0.3px` |
+| Stat value | display | `22px` | 800 | — |
+| Section h2 | sistema | `13px` uppercase | — | `1.2px` |
+| Corpo | sistema | `14–17px` | — | — |
+| Meta | sistema | `12–12.5px` | — | — |
+
+A lista de seletores que recebem a face é explícita, não uma regra em `h1, h2, h3`: os `h2` deste site são rótulos de `13px` em caixa alta, que é UI e não display — a face arredondada num rótulo desses só engorda o traço.
 
 ## Espaçamento, raio, layout
 

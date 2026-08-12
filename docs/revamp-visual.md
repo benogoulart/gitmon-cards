@@ -155,7 +155,17 @@ O snippet de README continua onde está: é o destino secundário, não some.
 
 ---
 
-## Fase 3 — o site
+## Fase 3 — o site — **FEITA**
+
+O custo da webfont saiu **abaixo** do orçado: o plano contava ~43 KB por peso,
+que é o TTF que o Satori consome. O navegador aceita WOFF2 — o mesmo subset
+comprimido com Brotli — e são 14 KB por peso. Com dois pesos, 28 KB no total.
+
+A 3.2 mudou de forma ao ser construída. "Usar `--element` em mais lugares" viraria
+mais texto colorido, que é justamente o sintoma. O que faltava era **superfície**:
+7% do tipo no fundo das caixas e 22% nas bordas mudam a temperatura da página
+inteira sem uma palavra trocar de cor. É a mesma correção que a carta recebeu na
+fase 1.3.
 
 ### 3.1 Webfont
 

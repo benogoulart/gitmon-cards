@@ -73,12 +73,13 @@ item: foil reassado em quatro camadas · serial como elemento de design · mais
 arte e a solda · HP como herói · raridade em superfície e borda. 114 testes
 unitários, 13 e2e, typecheck limpo.
 
-A **fase 2 (compartilhamento) também está implementada**: prévia de link em
-paisagem, baixar PNG e Web Share com fallback para copiar. 116 testes unitários,
-16 e2e.
+A **fase 2 (compartilhamento)** está implementada: prévia de link em paisagem,
+baixar PNG e Web Share com fallback para copiar.
 
-**A fase 3 (site) não foi tocada** — webfont da carta no site e cor de elemento
-no resto da página.
+A **fase 3 (o site)** também: a face da carta em display e título, e o tipo como
+superfície no painel inteiro.
+
+**O revamp inteiro está feito.** 116 testes unitários, 16 e2e, typecheck limpo.
 
 O que outra sessão precisa saber:
 
@@ -103,6 +104,17 @@ O que outra sessão precisa saber:
    disputando a máquina, passa dos 30s padrão do Playwright — daí o
    `test.setTimeout` explícito no e2e dela. O preço é aceito para nunca existir
    uma segunda versão da carta (RFC 4.2).
+6. **`npm run fonts` gera dois formatos por peso, e os dois são necessários.** O
+   Satori lê do disco e só entende TrueType; o navegador entende WOFF2 e paga um
+   terço dos bytes pelo mesmo desenho. `web: true` na tabela `WEIGHTS` marca os
+   pesos que o site usa — o Regular não recebe WOFF2 porque não há texto de 400
+   na face da carta dentro do site.
+7. **`--surface-tint` e `--border-tint` são declarados três vezes de propósito**
+   (`:root`, `.card-panel`, `.repo-list`). Um custom property que referencia
+   outro é substituído no elemento onde é declarado, não onde é usado: declarado
+   só em `:root`, o `var(--element)` de dentro resolveria para nada e o valor já
+   morto desceria por herança. Bloco novo com `--element` próprio precisa entrar
+   nessa lista.
 
 ## Superdesign
 
