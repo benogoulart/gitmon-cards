@@ -2,6 +2,7 @@ import { GitmonError } from "../github/errors";
 import type { GitHubRepo, GitHubUser } from "../github/types";
 import { ELEMENT_CHAIN, elementForLanguage } from "./elements";
 import {
+  FOOTER_CHARS,
   clamp,
   costForDamage,
   roundDamage,
@@ -202,9 +203,16 @@ function attacksFromRepos(repos: GitHubRepo[]): Attack[] {
     });
 }
 
-/** Bio truncada + ano de criação da conta (RFC 6.1). Factual, sem flavor text. */
+/**
+ * Bio truncada + ano de criação da conta (RFC 6.1). Factual, sem flavor text.
+ *
+ * O orçamento é 36 caracteres para a linha inteira, e o ano é inegociável — é o
+ * único fato dela que não está em nenhum outro lugar da carta. A bio fica com o
+ * que sobra. Ver `FOOTER_CHARS`.
+ */
 function profileFooter(user: GitHubUser): string {
-  const since = year(user.created_at);
-  const bio = user.bio ? truncate(user.bio, 72) : "";
-  return bio ? `${bio} · ${since}` : `${since}`;
+  const since = String(year(user.created_at));
+  const room = FOOTER_CHARS - since.length - 3;
+  const bio = user.bio ? truncate(user.bio, room) : "";
+  return bio ? `${bio} · ${since}` : since;
 }

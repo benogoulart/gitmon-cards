@@ -130,9 +130,20 @@ A luz do PNG é `feDistantLight` (azimute `250`, elevação `52`), não pontual:
 
 Tudo é alpha, nenhum pixel opaco e nenhum preto: o Satori não tem `mix-blend-mode` e qualquer área escura viraria véu cinza. O foil é o único asset gravado como PNG indexado (256 cores): ruído de baixo contraste cabe em 230 KB em vez de 780 KB sem diferença visível, e nas molduras a mesma quantização faria faixas nos gradientes largos.
 
-## Número de série
+## Rodapé e número de série
 
-`#0042`, zero-padded em quatro dígitos, ao lado do símbolo no rodapé direito. Sequencial por ordem de geração, atribuído na primeira vez e imutável depois. Ausente quando não há store durável — nunca inventado localmente.
+Duas colunas: texto à esquerda em `284px`, selo à direita em `108px`. O selo é sempre o mesmo bloco — mesma largura, mesma altura, mesmo centro — e o que muda é quem manda dentro dele.
+
+| Estado | Selo |
+|---|---|
+| **com serial** | símbolo a `14px` em cima, `#0042` a `32px` peso 900 embaixo |
+| **sem serial** | símbolo sozinho, no corpo de `raritySymbolSize` (`23`–`34px` conforme a contagem de estrelas) |
+
+**A composição é desenhada para a carta sem serial.** Sem `REDIS_URL` a carta sai sem número, e isso não é exceção rara — é o estado padrão em desenvolvimento e o de qualquer deploy sem store durável. Desenhar primeiro o estado cheio deixaria um vazio no lugar do elemento herói toda vez que o Redis faltasse. Nada fora do selo se desloca entre os dois estados.
+
+O número fica em tinta cheia, não na cor do metal: ele é o elemento verdadeiramente escasso da carta — a única coisa que não pode ser recalculada — e precisa ler antes de decorar. Quem carrega o metal é o símbolo logo acima. `#0042` é zero-padded em quatro dígitos, sequencial por ordem de geração, atribuído na primeira vez e imutável depois; nunca inventado localmente. A partir do quinto dígito o corpo recua para não invadir o texto ao lado.
+
+A linha factual da esquerda tem orçamento de **36 caracteres** (`FOOTER_CHARS`), derivado da largura da coluna. O Satori não aplica `text-overflow: ellipsis`, então o que passa é cortado a seco no meio da palavra — truncar na camada de dados é o que faz o "…" ser o fim visível. Dono e ano nunca são reticenciados; a descrição fica com o que sobra e some inteira quando sobra pouco demais para informar.
 
 ## Regra para o Superdesign
 

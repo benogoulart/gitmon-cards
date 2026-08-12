@@ -40,5 +40,18 @@
 
   "status": { "y": 568, "height": 42, "iconSize": 22, "labelSize": 10, "valueSize": 15 },
 
-  "footer": { "top": 624, "left": 48, "right": 452, "size": 13, "symbolRight": 40 }
+  "_footerComment": "Duas linhas de texto à esquerda e um selo de largura fixa à direita. O selo é dimensionado para a carta SEM serial, onde o símbolo de raridade o ocupa sozinho e grande; quando há serial, o símbolo encolhe para acompanhante e o número vira o herói do mesmo bloco. É por isso que `stampWidth` não depende de haver serial — nada se desloca entre os dois estados, e o estado sem número nunca deixa buraco.",
+  "footer": {
+    "top": 620,
+    "left": 48,
+    "right": 452,
+    "size": 12,
+    "lineGap": 22,
+    "stampWidth": 108,
+    "stampGap": 12,
+    "stampHeight": 48,
+    "serialSize": 32,
+    "hashSize": 15,
+    "symbolSize": 14
+  }
 }

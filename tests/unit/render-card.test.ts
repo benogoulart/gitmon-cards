@@ -185,7 +185,11 @@ describe("renderCard", () => {
         // Sem serial: cobre o caminho em que o store durável não respondeu e a
         // carta precisa sair sem número em vez de com número errado.
         serial: null,
-        footer: "The library for web and native user interfaces · facebook · 2013",
+        // Exatamente o que `repoFooter` produz para facebook/react dentro do
+        // orçamento de `FOOTER_CHARS`: dono e ano inteiros, descrição com o
+        // resto. Uma string mais longa aqui testaria o corte a seco do Satori,
+        // que a camada de dados existe para nunca deixar acontecer.
+        footer: "The library for… · facebook · 2013",
       },
       "pt",
       "repo-ultra-rare.png",

@@ -108,25 +108,31 @@ export function raritySymbolColor(rarity: Rarity): string {
 }
 
 /**
- * Tamanho de fonte do símbolo. Não cresce linearmente por tier: a partir de duas
- * estrelas o conjunto já ocupa o dobro da largura, então o tamanho recua para o
- * rodapé não estourar (`layout.footer`).
+ * Tamanho do símbolo **quando ele é o herói do selo** — ou seja, na carta sem
+ * serial, onde ele assume sozinho o bloco da direita do rodapé (`layout.footer`).
+ *
+ * Não cresce linearmente por tier, e sim ao contrário: a partir de duas estrelas
+ * o conjunto já ocupa o dobro da largura, então o corpo recua para o selo não
+ * estourar. Três estrelas a 32px sairiam por cima do texto ao lado.
+ *
+ * Na carta **com** serial o símbolo é acompanhante e não herói: ali ele usa o
+ * `symbolSize` fixo de `layout.footer`, porque quem manda no bloco é o número.
  */
 export function raritySymbolSize(rarity: Rarity): number {
   switch (rarity) {
     case "common":
-      return 14;
+      return 34;
     case "uncommon":
-      return 16;
+      return 32;
     case "rare":
     case "illustration_rare":
-      return 18;
+      return 32;
     case "double_rare":
     case "ultra_rare":
     case "special_illustration_rare":
-      return 15;
+      return 28;
     case "hyper_rare":
-      return 13;
+      return 23;
   }
 }
 
