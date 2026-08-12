@@ -38,6 +38,9 @@ export function frameSvg(layout, colors, { fullArt = false } = {}) {
   const inner = { x: B, y: B, w: W - B * 2, h: H - B * 2, r: R - 6 };
   const bezel = 4;
 
+  /** Altura da faixa do nome. A janela começa exatamente onde ela termina. */
+  const nameBand = win.y - inner.y;
+
   const typeStrip = `<rect x="${layout.typeStrip.x}" y="${layout.typeStrip.y}" width="${layout.typeStrip.width}"
           height="${layout.typeStrip.height}" rx="6" fill="${colors.base}" fill-opacity="${fullArt ? 0.62 : 0.2}"
           stroke="${colors.dark}" stroke-opacity="${fullArt ? 0.55 : 0.3}" stroke-width="1"/>`;
@@ -91,11 +94,13 @@ export function frameSvg(layout, colors, { fullArt = false } = {}) {
     ${
       fullArt
         ? ""
-        : `<!-- Faixa do nome. O texto entra por cima, em runtime. -->
+        : `<!-- Faixa do nome. O texto entra por cima, em runtime. A altura sai da
+         posição da janela: as duas se encostam por construção, e mexer numa
+         sem a outra é o erro clássico deste arquivo. -->
     <path d="M${inner.x} ${inner.y + inner.r} a${inner.r} ${inner.r} 0 0 1 ${inner.r} -${inner.r}
              h${inner.w - inner.r * 2} a${inner.r} ${inner.r} 0 0 1 ${inner.r} ${inner.r}
-             v${86 - inner.r} h-${inner.w} z" fill="url(#faixa)"/>
-    <line x1="${inner.x}" y1="${inner.y + 86}" x2="${inner.x + inner.w}" y2="${inner.y + 86}"
+             v${nameBand - inner.r} h-${inner.w} z" fill="url(#faixa)"/>
+    <line x1="${inner.x}" y1="${win.y}" x2="${inner.x + inner.w}" y2="${win.y}"
           stroke="${colors.dark}" stroke-opacity="0.35" stroke-width="1.5"/>
 
     <!-- Bisel da janela: o retângulo é maior que o furo, então sobra um anel. -->
@@ -138,11 +143,55 @@ export function frameSvg(layout, colors, { fullArt = false } = {}) {
       : ""
   }
 
-  <!-- Desenhado depois da máscara: fica por cima da arte, como o fio dourado de
-       uma carta de verdade. -->
-  <rect x="${win.x}" y="${win.y}" width="${win.width}" height="${win.height}" rx="${win.radius}"
-        fill="none" stroke="${colors.base}" stroke-opacity="0.85" stroke-width="2"/>
+  ${solda(win, colors)}
 </svg>`;
+}
+
+/**
+ * A solda: a transição entre a arte e a moldura.
+ *
+ * Era um retângulo arredondado com um traço de 2px, e é o que mais separava esta
+ * carta de uma impressa. Numa carta de verdade a ilustração não está *colada* na
+ * moldura, está **embutida** nela — há profundidade na junta, e o olho lê isso
+ * antes de ler qualquer outra coisa do acabamento.
+ *
+ * São três coisas, e nenhuma delas é o traço:
+ *
+ *   sombra   um traço grosso e desfocado, recortado para dentro da janela. É o
+ *            que faz a arte parecer rebaixada sob a moldura em vez de impressa
+ *            no mesmo plano. O recorte é obrigatório: sem ele o desfoque vaza
+ *            para fora e suja a face da carta com um halo.
+ *   fio      o traço de cor, agora com 1.5px e encostado no fio claro
+ *   luz      um fio branco por dentro, no topo, onde a luz bate no bisel
+ *
+ * Tudo isto é desenhado **depois** da máscara, portanto por cima da arte — e por
+ * isso vale igual no layout padrão e no full-art, onde a janela é quase a carta
+ * inteira.
+ */
+function solda(win, colors) {
+  const inset = (n) => ({
+    x: win.x + n,
+    y: win.y + n,
+    width: win.width - n * 2,
+    height: win.height - n * 2,
+    radius: Math.max(1, win.radius - n),
+  });
+
+  const rect = (r, attrs) =>
+    `<rect x="${r.x}" y="${r.y}" width="${r.width}" height="${r.height}" rx="${r.radius}" fill="none" ${attrs}/>`;
+
+  return `<defs>
+    <filter id="soldaBlur"><feGaussianBlur stdDeviation="4"/></filter>
+    <clipPath id="dentroDaJanela">
+      <rect x="${win.x}" y="${win.y}" width="${win.width}" height="${win.height}" rx="${win.radius}"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#dentroDaJanela)">
+    ${rect(inset(4), `stroke="${colors.ink}" stroke-opacity="0.5" stroke-width="9" filter="url(#soldaBlur)"`)}
+  </g>
+  ${rect(inset(0.75), `stroke="${colors.base}" stroke-opacity="0.9" stroke-width="1.5"`)}
+  ${rect(inset(2), `stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1"`)}`;
 }
 
 const METALS = {

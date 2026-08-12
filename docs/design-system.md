@@ -130,6 +130,22 @@ A luz do PNG é `feDistantLight` (azimute `250`, elevação `52`), não pontual:
 
 Tudo é alpha, nenhum pixel opaco e nenhum preto: o Satori não tem `mix-blend-mode` e qualquer área escura viraria véu cinza. O foil é o único asset gravado como PNG indexado (256 cores): ruído de baixo contraste cabe em 230 KB em vez de 780 KB sem diferença visível, e nas molduras a mesma quantização faria faixas nos gradientes largos.
 
+## Janela da arte e a solda
+
+`420×310` = **37,2%** do canvas, contra `390×300` (33,4%) do layout original. A vertical já estava no limite — a faixa do nome acima e a de tipo abaixo não davam folga —, então o ganho veio de recalcular o empilhamento inteiro: faixa do nome `86→84`, faixa de tipo `34→32`, caixa de ataque `52→48`, status `42→40`. Nenhum deles estava apertado; a janela estava.
+
+Janela, faixa de tipo, painel de ataques e faixa de status dividem a mesma coluna `40..460`. Antes eram quatro larguras diferentes empilhadas, o que lê como erro de impressão.
+
+**A solda** — a transição arte/moldura — era um retângulo arredondado com um traço de 2px, e é o que mais separava esta carta de uma impressa. Numa carta de verdade a ilustração não está colada na moldura, está embutida nela. São três camadas, e nenhuma delas é o traço:
+
+| Camada | O que faz |
+|---|---|
+| sombra | traço de `9px` desfocado em `4`, **recortado para dentro da janela** — é o que rebaixa a arte sob a moldura. Sem o recorte o desfoque vaza e suja a face com halo |
+| fio | o traço de cor, `1.5px`, encostado no fio claro |
+| luz | fio branco por dentro, onde a luz bate no bisel |
+
+Desenhada depois da máscara, portanto por cima da arte — vale igual no layout padrão e no full-art.
+
 ## Cabeçalho da carta
 
 **O HP ganha do nome.** `46px` peso 900 contra `28px` — antes eram `34` contra `30`, e nessa distância os dois competiam sem que nenhum vencesse: a carta não tinha ponto de entrada num thumbnail de feed. Na régua Wrapped/Skyline o que faz a peça ler em um segundo é um número grande.
