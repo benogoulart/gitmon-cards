@@ -252,6 +252,83 @@ export function metalSvg(layout, tone) {
 </svg>`;
 }
 
+export const EDGE_STYLES = ["polished", "double"];
+
+/**
+ * Tratamento de borda por tier.
+ *
+ * Existe porque contagem e cor de estrela a 14px não sobrevivem a um thumbnail
+ * de feed, e o feed é o destino principal da carta. O tier precisava se
+ * expressar também em **superfície e borda** — a superfície é o foil, e a borda
+ * é isto.
+ *
+ * É uma camada separada e **sem elemento**, na mesma convenção do metal e pelo
+ * mesmo motivo: a RFC 8 escolheu o caminho C justamente para não multiplicar
+ * tipo × raridade. Dois arquivos cobrem os oito tiers em vez de 18 × 8.
+ *
+ *   polished   o anel da borda clareia — a moldura lê como polida
+ *   double     o mesmo anel, mais um fio interno traçando a carta por dentro
+ *
+ * `double` é literal de propósito: no TCG a Double Rare tem moldura articulada, e
+ * um segundo fio é o que separa `rare` de `double_rare` a 150px, onde a
+ * diferença de uma estrela para duas some. As duas eram indistinguíveis antes.
+ *
+ * Os tiers com metal não recebem borda: o anel folheado já é o tratamento da
+ * borda deles, e somar os dois só apaga o folheado.
+ */
+export function edgeSvg(layout, style) {
+  if (!EDGE_STYLES.includes(style)) {
+    throw new Error(`Estilo de borda desconhecido: ${style}`);
+  }
+
+  const { width: W, height: H, radius: R, border: B } = layout;
+  const inner = { x: B, y: B, w: W - B * 2, h: H - B * 2, r: R - 6 };
+
+  /* Recuo do fio interno: entre a borda e a coluna 40..460 dos blocos, então
+     ele contorna a carta inteira sem cruzar janela, ataques nem status. */
+  const keyline = 9;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <defs>
+    <!--
+      Lustro, não alvejante. A primeira calibração ia a 0.40 no pico e a moldura
+      da rare saía rosa-clara: o tier ficava legível às custas do elemento, que é
+      a outra metade da identidade da carta. O anel tem que ler como luz correndo
+      na borda, com a cor do tipo ainda por baixo.
+    -->
+    <linearGradient id="polido" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="${style === "double" ? 0.3 : 0.24}"/>
+      <stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="0.63" stop-color="#FFFFFF" stop-opacity="0.19"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Anel da borda. Traço e não preenchimento: o miolo da carta continua
+       transparente, como no metal. -->
+  <rect x="${B / 2}" y="${B / 2}" width="${W - B}" height="${H - B}" rx="${R - 3}"
+        fill="none" stroke="url(#polido)" stroke-width="${B}"/>
+
+  <!-- Fio claro onde a borda encosta na face. -->
+  <rect x="${inner.x}" y="${inner.y}" width="${inner.w}" height="${inner.h}" rx="${inner.r}"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1.5"/>
+${
+  style === "double"
+    ? `
+  <!-- O segundo fio. Traço escuro, não área escura: uma linha composta por cima
+       é uma linha; um retângulo translúcido escuro viraria véu cinza, que é o
+       que o Satori sem mix-blend-mode faz com qualquer sombra chapada. -->
+  <rect x="${inner.x + keyline}" y="${inner.y + keyline}" width="${inner.w - keyline * 2}"
+        height="${inner.h - keyline * 2}" rx="${Math.max(2, inner.r - keyline)}"
+        fill="none" stroke="#1A1614" stroke-opacity="0.34" stroke-width="1.5"/>
+  <rect x="${inner.x + keyline + 2}" y="${inner.y + keyline + 2}" width="${inner.w - keyline * 2 - 4}"
+        height="${inner.h - keyline * 2 - 4}" rx="${Math.max(1, inner.r - keyline - 2)}"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1"/>`
+    : ""
+}
+</svg>`;
+}
+
 /** Glifos dos ícones de energia. Geometria primitiva, desenhada aqui do zero. */
 const GLYPHS = {
   neutral: '<circle cx="12" cy="12" r="6.2" fill="none" stroke-width="3.4"/>',

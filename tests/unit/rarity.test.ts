@@ -103,11 +103,42 @@ describe("tratamento visual", () => {
   });
 
   it("mantém a hyper_rare no layout padrão, distinguindo-a da special", () => {
-    expect(cardTreatment("hyper_rare")).toEqual({ fullArt: false, metal: "gold" });
+    expect(cardTreatment("hyper_rare")).toEqual({
+      fullArt: false,
+      metal: "gold",
+      edge: null,
+    });
     expect(cardTreatment("special_illustration_rare")).toEqual({
       fullArt: true,
       metal: "gold",
+      edge: null,
     });
+  });
+
+  /*
+   * O anel folheado já é o tratamento de borda dos tiers que o têm. Somar os
+   * dois não faz um tier mais raro — apaga o folheado, que é o sinal mais caro
+   * da carta.
+   */
+  it("nunca põe metal e borda no mesmo tier", () => {
+    for (const rarity of RARITIES) {
+      const { metal, edge } = cardTreatment(rarity);
+      expect(metal !== null && edge !== null, rarity).toBe(false);
+    }
+  });
+
+  /*
+   * O que o thumbnail de feed enxerga é a combinação de layout, metal e borda —
+   * não a contagem de estrelas, ilegível a 150px. Se dois tiers colapsarem na
+   * mesma combinação, a escada volta a morrer no tamanho em que a carta mais
+   * vive, e nada mais quebra.
+   */
+  it("dá combinação própria a cada tier a partir da rare", () => {
+    const combos = RARITIES.filter(hasFoil).map((r) => {
+      const { fullArt, metal, edge } = cardTreatment(r);
+      return `${fullArt}:${metal}:${edge}`;
+    });
+    expect(new Set(combos).size).toBe(combos.length);
   });
 
   /*

@@ -174,11 +174,16 @@ export function foilIntensity(rarity: Rarity): number {
 
 export type MetalTone = "silver" | "gold";
 
+/** Ver `edgeSvg` em `scripts/lib/art.mjs`. */
+export type CardEdge = "polished" | "double";
+
 export interface CardTreatment {
   /** Janela da arte em sangria, com nome e faixa de tipo por cima dela. */
   fullArt: boolean;
   /** Camada metálica sobre a moldura, ou `null`. */
   metal: MetalTone | null;
+  /** Tratamento do anel da borda, ou `null`. Nunca coexiste com `metal`. */
+  edge: CardEdge | null;
 }
 
 /**
@@ -188,8 +193,10 @@ export interface CardTreatment {
  * `ultra_rare` e `special_illustration_rare` saíam praticamente idênticas, já que
  * a arte é sempre o mesmo avatar na mesma moldura. A escada visual agora é:
  *
- *   rare / double_rare          layout padrão, só foil
- *   illustration_rare           full-art sem metal
+ *   common / uncommon           layout padrão, sem foil, sem borda
+ *   rare                        layout padrão + borda polida
+ *   double_rare                 layout padrão + borda dupla
+ *   illustration_rare           full-art + borda polida
  *   ultra_rare                  full-art + prata
  *   special_illustration_rare   full-art + ouro
  *   hyper_rare                  layout padrão + ouro (folheada, como no TCG)
@@ -198,18 +205,32 @@ export interface CardTreatment {
  * gravada sobre a carta normal, não sobre full-art, e isso a torna distinguível
  * da `special_illustration_rare` à primeira vista em vez de por contagem de
  * estrelas.
+ *
+ * A borda entrou porque a escada morria no thumbnail, que é onde a carta mais
+ * vive (D13). `rare` e `double_rare` dividiam layout, ausência de metal e — até
+ * o foil ganhar temperaturas próprias — a mesma superfície: a 150px eram a mesma
+ * carta, e a única diferença era uma estrela contra duas, ilegível nesse
+ * tamanho. Ver `edgeSvg` em `scripts/lib/art.mjs`.
+ *
+ * **Metal e borda nunca coexistem.** O anel folheado já é o tratamento de borda
+ * dos tiers que o têm, e somar os dois só apaga o folheado. Os dois juntos num
+ * tier é bug, não escada nova — coberto em `tests/unit/rarity.test.ts`.
  */
 export function cardTreatment(rarity: Rarity): CardTreatment {
   switch (rarity) {
+    case "rare":
+      return { fullArt: false, metal: null, edge: "polished" };
+    case "double_rare":
+      return { fullArt: false, metal: null, edge: "double" };
     case "illustration_rare":
-      return { fullArt: true, metal: null };
+      return { fullArt: true, metal: null, edge: "polished" };
     case "ultra_rare":
-      return { fullArt: true, metal: "silver" };
+      return { fullArt: true, metal: "silver", edge: null };
     case "special_illustration_rare":
-      return { fullArt: true, metal: "gold" };
+      return { fullArt: true, metal: "gold", edge: null };
     case "hyper_rare":
-      return { fullArt: false, metal: "gold" };
+      return { fullArt: false, metal: "gold", edge: null };
     default:
-      return { fullArt: false, metal: null };
+      return { fullArt: false, metal: null, edge: null };
   }
 }

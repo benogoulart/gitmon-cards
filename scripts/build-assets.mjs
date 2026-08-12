@@ -9,7 +9,15 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { foilSvg, frameSvg, metalSvg, METAL_TONES, retreatSvg } from "./lib/art.mjs";
+import {
+  edgeSvg,
+  EDGE_STYLES,
+  foilSvg,
+  frameSvg,
+  metalSvg,
+  METAL_TONES,
+  retreatSvg,
+} from "./lib/art.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = async (path) => JSON.parse(await readFile(join(root, path), "utf8"));
@@ -53,6 +61,13 @@ for (const element of elements) {
 console.log("\nmetal");
 for (const tone of METAL_TONES) {
   await emit(`frames/metal-${tone}.png`, metalSvg(layout, tone));
+}
+
+// Dois arquivos para os oito tiers, sem elemento: é a RFC 8 caminho C outra vez
+// — o que varia por raridade nunca multiplica pelos 18 tipos.
+console.log("\nborda");
+for (const style of EDGE_STYLES) {
+  await emit(`frames/edge-${style}.png`, edgeSvg(layout, style));
 }
 
 /*

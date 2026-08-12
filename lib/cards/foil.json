@@ -13,10 +13,10 @@
     "hyper_rare": 1
   },
 
-  "_bandsComment": "Temperatura espectral: as cores que a faixa percorre ao longo da diagonal da carta. Existe só nos tiers com foil (hasFoil), e um tier a mais aqui sem o par em hasFoil gera um PNG que ninguém compõe. ultra_rare foge do arco-íris de propósito: no TCG ela é full-art texturizada prateada, e prata só lê como prata se não competir com as outras cores.",
+  "_bandsComment": "Temperatura espectral: as cores que a faixa percorre ao longo da diagonal da carta. Existe só nos tiers com foil (hasFoil), e um tier a mais aqui sem o par em hasFoil gera um PNG que ninguém compõe. ultra_rare foge do arco-íris de propósito: no TCG ela é full-art texturizada prateada, e prata só lê como prata se não competir com as outras cores. rare e double_rare tinham as MESMAS quatro cores e a 150px eram a mesma carta — a diferença de intensidade sozinha não separa dois tiers vizinhos num thumbnail. Agora a rare é fria e a double_rare é verde-dourada.",
   "bands": {
-    "rare": ["#8FD9FF", "#D9A8FF", "#A8FFD1", "#FFE9A8"],
-    "double_rare": ["#8FD9FF", "#D9A8FF", "#A8FFD1", "#FFE9A8"],
+    "rare": ["#8FD9FF", "#B7C4FF", "#D9A8FF", "#A8E6FF"],
+    "double_rare": ["#A8FFD1", "#FFE9A8", "#7FE0B4", "#D8F58F"],
     "illustration_rare": ["#FFE9A8", "#FFC98F", "#D9A8FF", "#8FD9FF"],
     "ultra_rare": ["#E8EEF5", "#C8CDD4", "#F2F6FA", "#D6DEE8"],
     "special_illustration_rare": ["#FFD76A", "#FF8FD0", "#7FE7FF", "#FFF3B0"],

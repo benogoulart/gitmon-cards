@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
 import layout from "../cards/layout.json";
-import type { MetalTone } from "../cards/rarity";
+import type { CardEdge, MetalTone } from "../cards/rarity";
 import type { Element, Rarity } from "../cards/types";
 
 /**
@@ -66,6 +66,7 @@ export async function loadFonts(): Promise<SatoriFont[]> {
 export const frameUri = (element: Element, fullArt = false) =>
   dataUri(`frames/${fullArt ? "fullart-" : ""}${element}.png`);
 export const metalUri = (tone: MetalTone) => dataUri(`frames/metal-${tone}.png`);
+export const edgeUri = (edge: CardEdge) => dataUri(`frames/edge-${edge}.png`);
 export const energyUri = (element: Element) => dataUri(`energy/${element}.png`);
 export const retreatUri = () => dataUri("icons/retreat.png");
 /**

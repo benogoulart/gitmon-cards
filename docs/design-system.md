@@ -91,13 +91,21 @@ Oito tiers, na escada do TCG Pokémon. A leitura é **contagem + cor** de estrel
 
 Símbolo sozinho não separava os tiers altos — a arte é sempre o mesmo avatar. A escada real é a combinação de layout e metal:
 
-| Tier | Layout | Metal |
-|---|---|---|
-| rare · double_rare | padrão | — |
-| illustration_rare | **full-art** | — |
-| ultra_rare | **full-art** | prata |
-| special_illustration_rare | **full-art** | ouro |
-| hyper_rare | padrão | ouro |
+| Tier | Layout | Metal | Borda |
+|---|---|---|---|
+| common · uncommon | padrão | — | — |
+| rare | padrão | — | polida |
+| double_rare | padrão | — | **dupla** |
+| illustration_rare | **full-art** | — | polida |
+| ultra_rare | **full-art** | prata | — |
+| special_illustration_rare | **full-art** | ouro | — |
+| hyper_rare | padrão | ouro | — |
+
+A borda entrou porque a escada morria no thumbnail, e o thumbnail é onde a carta mais vive. `rare` e `double_rare` dividiam layout, ausência de metal e — até o foil ganhar temperaturas próprias — a mesma superfície: a 150px eram a mesma carta, e a única diferença era uma estrela contra duas. `polished` clareia o anel da borda; `double` acrescenta um fio interno traçando a carta, literal como a moldura articulada da Double Rare no TCG.
+
+**Metal e borda nunca coexistem**, e há teste disso: o anel folheado já é o tratamento de borda dos tiers que o têm, e somar os dois só apaga o folheado. O lustro do `polished` fica em `0.24` no pico e não em `0.40` — a primeira calibração deixava a moldura da `rare` rosa-clara, tornando o tier legível às custas do elemento, que é a outra metade da identidade da carta.
+
+Como o metal, a borda é uma camada **sem elemento**: dois arquivos cobrem os oito tiers. É a RFC 8 caminho C outra vez — o que varia por raridade nunca multiplica pelos 18 tipos.
 
 Full-art: a janela sobe até a borda e desce até `448`, onde os ataques começam. A arte passa por trás do nome e da faixa de tipo; o nome vira branco sobre um scrim escuro de `118px` e o HP clareia para `#FF7A66`. Abaixo de `448` a face continua opaca — ataques e status precisam de fundo sólido.
 
@@ -114,6 +122,8 @@ Os tiers acima de `double_rare` foram calibrados contra perfis reais medidos pel
 Uma escada só, em `lib/cards/foil.json`, lida pelas duas pontas: `foilIntensity()` a multiplica nas opacidades do CSS ao vivo, e `foilSvg()` a multiplica nas quatro camadas do PNG assado. Antes eram dois conjuntos de números descrevendo a mesma coisa.
 
 `0.42` rare · `0.55` double_rare · `0.78` illustration_rare · `0.88` ultra_rare · `0.95` special_illustration_rare · `1` hyper_rare. Não é linear: o salto grande fica onde o tratamento também vira full-art.
+
+Cada tier tem sua **temperatura espectral** — as quatro cores que a faixa percorre na diagonal. `rare` é fria (azul/violeta), `double_rare` é verde-dourada, `illustration_rare` é quente, `ultra_rare` foge do arco-íris para ler como prata, `special_illustration_rare` é o arco-íris cheio e `hyper_rare` é ouro. `rare` e `double_rare` tinham as mesmas quatro cores: a diferença de intensidade sozinha não separa dois tiers vizinhos num thumbnail.
 
 Quatro camadas, na mesma ordem nos dois foils:
 

@@ -17,6 +17,7 @@ não arquivo.** Toda moldura, ícone de tipo e ícone de energia deste projeto �
 | Ícone de tipo (pequeno — fraqueza/resistência/recuo) | 7 + 1 de recuo | `public/assets/icons/` |
 | Overlay de foil | 12 (dois por tier a partir de `rare`) | `public/assets/frames/foil-*` e `fullart-foil-*` |
 | Overlay metálico | 2 (ouro e prata) | `public/assets/frames/metal-*` |
+| Overlay de borda | 2 (polida e dupla) | `public/assets/frames/edge-*` |
 | Fontes | 1-2 famílias, licença livre para embed | `public/assets/fonts/` |
 
 O foil deixou de ser "1-2 só nas raridades altas": no TCG a `rare` já vem com

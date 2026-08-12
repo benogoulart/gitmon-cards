@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderCard } from "@/lib/og/renderCard";
-import { ELEMENTS, type Card } from "@/lib/cards/types";
+import { ELEMENTS, RARITIES, type Card } from "@/lib/cards/types";
 
 /**
  * Smoke test do renderizador. Não compara pixels — compara que a composição
@@ -128,6 +128,19 @@ describe("renderCard", () => {
     );
     expect(isPng(png)).toBe(true);
   }, 60_000);
+
+  /*
+   * A escada inteira, um PNG por tier, para a verificação que nenhum teste faz:
+   * **olhar os oito lado a lado, reduzidos a ~150px**. O alvo declarado do plano
+   * é distinguir os tiers num thumbnail de feed sem ler texto, e isso não se
+   * confere no monitor inteiro nem em asserção.
+   */
+  it("renderiza os oito tiers da escada", async () => {
+    for (const rarity of RARITIES) {
+      const png = await toPng({ ...BASE, rarity }, "en", `tier-${rarity}.png`);
+      expect(isPng(png)).toBe(true);
+    }
+  }, 120_000);
 
   /*
    * Um por tratamento visual: full-art puro, full-art prata, full-art ouro e

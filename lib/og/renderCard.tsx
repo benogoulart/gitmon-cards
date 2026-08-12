@@ -14,6 +14,7 @@ import { elementKey, rarityKey, translator, type Locale } from "../i18n/dictiona
 import {
   CARD_FONT,
   avatarUri,
+  edgeUri,
   energyUri,
   foilUri,
   frameUri,
@@ -42,14 +43,25 @@ export async function renderCard(card: Card, locale: Locale): Promise<ImageRespo
   const art = treatment.fullArt ? layout.fullArt.art : layout.art;
   const artWindow = treatment.fullArt ? layout.fullArt.window : layout.window;
 
-  const [fonts, frame, avatar, energy, retreat, foil, metal, weaknessIcon, resistanceIcon] =
-    await Promise.all([
+  const [
+    fonts,
+    frame,
+    avatar,
+    energy,
+    retreat,
+    foil,
+    edge,
+    metal,
+    weaknessIcon,
+    resistanceIcon,
+  ] = await Promise.all([
       loadFonts(),
       frameUri(card.element, treatment.fullArt),
       avatarUri(card.artUrl, art.width),
       energyUri(card.element),
       retreatUri(),
       hasFoil(card.rarity) ? foilUri(card.rarity, treatment.fullArt) : Promise.resolve(null),
+      treatment.edge ? edgeUri(treatment.edge) : Promise.resolve(null),
       treatment.metal ? metalUri(treatment.metal) : Promise.resolve(null),
       card.weakness ? energyUri(card.weakness) : Promise.resolve(null),
       card.resistance ? energyUri(card.resistance) : Promise.resolve(null),
@@ -105,6 +117,20 @@ export async function renderCard(card: Card, locale: Locale): Promise<ImageRespo
           height={layout.height}
           style={{ position: "absolute", left: 0, top: 0 }}
         />
+
+        {/*
+          Borda antes do foil: ela é relevo da própria moldura, e o brilho
+          holográfico passa por cima dela como passa por cima do resto da carta.
+          Nunca coexiste com o metal — ver `cardTreatment`.
+        */}
+        {edge ? (
+          <img
+            src={edge}
+            width={layout.width}
+            height={layout.height}
+            style={{ position: "absolute", left: 0, top: 0 }}
+          />
+        ) : null}
 
         {foil ? (
           <img
