@@ -73,10 +73,12 @@ item: foil reassado em quatro camadas · serial como elemento de design · mais
 arte e a solda · HP como herói · raridade em superfície e borda. 114 testes
 unitários, 13 e2e, typecheck limpo.
 
-**As fases 2 (compartilhamento) e 3 (site) não foram tocadas.** A fase 2 é OG na
-página da carta, baixar PNG e Web Share — e o plano registra que OG é o primeiro
-candidato a corte se a frente precisar ficar estreita. A fase 3 é a webfont da
-carta no site e a cor de elemento no resto da página.
+A **fase 2 (compartilhamento) também está implementada**: prévia de link em
+paisagem, baixar PNG e Web Share com fallback para copiar. 116 testes unitários,
+16 e2e.
+
+**A fase 3 (site) não foi tocada** — webfont da carta no site e cor de elemento
+no resto da página.
 
 O que outra sessão precisa saber:
 
@@ -95,6 +97,12 @@ O que outra sessão precisa saber:
    C). Foil, metal e borda são camadas sem elemento. A única exceção é o foil,
    que tem duas variantes — padrão e full-art — porque recua sobre a janela da
    arte, e a janela do full-art é outra.
+5. **`/api/card-og/<id>` é a rota mais cara do produto**, por construção: ela
+   renderiza a carta inteira e depois a compõe numa segunda passada de Satori.
+   Quente responde em meio segundo; a frio, no dev server com quatro workers
+   disputando a máquina, passa dos 30s padrão do Playwright — daí o
+   `test.setTimeout` explícito no e2e dela. O preço é aceito para nunca existir
+   uma segunda versão da carta (RFC 4.2).
 
 ## Superdesign
 

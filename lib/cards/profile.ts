@@ -2,6 +2,7 @@ import { GitmonError } from "../github/errors";
 import type { GitHubRepo, GitHubUser } from "../github/types";
 import { ELEMENT_CHAIN, elementForLanguage } from "./elements";
 import {
+  CARD_NAME_CHARS,
   FOOTER_CHARS,
   clamp,
   costForDamage,
@@ -68,7 +69,13 @@ export function buildProfileCard(
   return {
     kind: "profile",
     id: user.login,
-    name: user.name?.trim() || user.login,
+    /*
+     * O nome de exibição é livre no GitHub e o do repositório não é — daí este
+     * ser o único que ainda saía sem truncar. A escada de `nameSize` encolhe
+     * até 19px e para; a partir de ~26 caracteres o Satori corta a seco, no meio
+     * da palavra e sem reticências. Só apareceu ampliando a prévia de link.
+     */
+    name: truncate(user.name?.trim() || user.login, CARD_NAME_CHARS),
     element,
     hp,
     attacks,

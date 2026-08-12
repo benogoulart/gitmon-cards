@@ -5,7 +5,7 @@ import { BattleForm } from "@/components/battle/BattleForm";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Shell } from "@/components/ui/Shell";
 import { getProfileCard, getProfileRepos } from "@/lib/cards";
-import { absoluteUrl } from "@/lib/config";
+import { cardMetadata } from "@/lib/metadata";
 import { translator } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/server";
 
@@ -13,11 +13,12 @@ type Params = { params: Promise<{ owner: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { owner } = await params;
-  return {
-    title: owner,
-    openGraph: { images: [absoluteUrl(`/${owner}.png`)] },
-    twitter: { card: "summary_large_image", images: [absoluteUrl(`/${owner}.png`)] },
-  };
+  return cardMetadata({
+    subject: owner,
+    path: `/${owner}`,
+    ogPath: `/api/card-og/${owner}`,
+    locale: await getLocale(),
+  });
 }
 
 export default async function ProfilePage({ params }: Params) {

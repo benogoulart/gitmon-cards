@@ -43,6 +43,22 @@ pacote, foil especular seguindo o ponteiro, radar de assinatura do perfil e um p
 derivações mostrando de onde cada número saiu. O PNG que viaja para o README de outra pessoa
 continua limpo.
 
+## Levar a carta embora
+
+Três saídas, para três destinos:
+
+| Saída | Para onde |
+|---|---|
+| **Baixar PNG** | Feed social, onde o arquivo é o produto inteiro e não há site em volta |
+| **Compartilhar** | Folha nativa do celular, com o arquivo quando o navegador aceita e o link quando não; no desktop, copia o link |
+| **Snippet de markdown** | README de outra pessoa |
+
+Colar a URL da página em qualquer lugar que leia Open Graph rende uma prévia em **paisagem**
+(`/api/card-og/<id>`), com a carta inteira ao lado dos números. A carta é 5:7 e as prévias de link
+são 1.91:1 — apontar o `og:image` direto para o `/<id>.png` fazia o corte comer o cabeçalho e o
+rodapé. A prévia embute o PNG real renderizado por `renderCard`, não uma segunda composição: o
+projeto só tem uma carta, e é assim que continua tendo.
+
 ## Rodando
 
 ```bash
@@ -113,6 +129,8 @@ app/
   api/
     card-image/[owner]/        rota de imagem do perfil    → reescrita de /<user>.png
     card-image/[owner]/[repo]/ rota de imagem do repo      → reescrita de /<owner>/<repo>.png
+    card-og/[owner]/           prévia de link em paisagem  → só o og:image aponta para cá
+    card-og/[owner]/[repo]/
     battle/[battleId]/image/   pôster do resultado         → reescrita de /battle/<id>.png
 
 components/
@@ -131,7 +149,8 @@ lib/
     layout.json                geometria da carta em pixels — fonte única
     palette.json               cor dos 18 tipos — fonte única, extraída dos ícones
   battle/                      motor de simulação turno-a-turno (RFC 7.3)
-  og/                          renderCard, renderBattle, renderError — Satori + sharp
+  og/                          renderCard, renderCardOg, renderBattle, renderError
+  metadata.ts                  tags de prévia de link, compartilhadas por perfil e repo
   cache/                       Redis, com fallback em memória para dev
   i18n/                        dicionários PT/EN (obrigatório desde a v1, RFC 9.1)
   config.ts                    URLs e políticas de cache — sem domínio hardcoded

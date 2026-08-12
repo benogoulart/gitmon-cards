@@ -1210,6 +1210,44 @@ select {
   color: var(--text-faint);
 }
 
+/*
+ * Baixar e compartilhar. Os dois têm o mesmo peso de propósito: qual deles é o
+ * caminho certo depende do aparelho, não da intenção — no celular a folha nativa
+ * resolve tudo, no desktop o arquivo em mãos é que resolve.
+ */
+.share-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/*
+ * Largura natural, não `flex: 1`. O `.card-side` atravessa a grade inteira, e
+ * dois botões esticados nele viram duas faixas de 600px — peso de banner para
+ * uma ação secundária.
+ */
+.share-button {
+  flex: 0 0 auto;
+  min-width: 160px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: border-color 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A cor do tipo é o realce, como no resto do painel. */
+.share-button:hover {
+  border-color: var(--element, var(--border-strong));
+}
+
 .copy-field {
   display: flex;
   align-items: stretch;

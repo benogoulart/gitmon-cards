@@ -129,12 +129,21 @@ Wrapped, o número é o herói.
 
 ---
 
-## Fase 2 — compartilhamento
+## Fase 2 — compartilhamento — **FEITA**
 
 Entrou no escopo por decisão sua. **Tensão registrada:** na rodada de init você
 escolheu "sem abrir frentes novas", e a opção citava OG do site como exemplo. OG
 é o item mais barato e de maior alcance desta fase; incluí, mas é o primeiro
 candidato a corte se você quiser manter a frente estreita.
+
+O plano errou o custo do OG, e por uma razão que só aparece olhando: as tags já
+existiam nas duas páginas desde antes, apontando para o `/<id>.png`. O item não
+era "escrever `metadata`" — era descobrir que **a carta é 5:7 e as prévias de
+link são 1.91:1**, e que o X e o LinkedIn cortavam pelo centro, comendo o
+cabeçalho e o rodapé. A carta chegava decapitada exatamente no lugar de maior
+alcance. Foi preciso uma imagem em paisagem, `renderCardOg`, que embute o PNG
+real em vez de recompor a carta — o projeto só tem uma carta e é assim que
+continua tendo (RFC 4.2).
 
 | Item | Por quê | Custo |
 |---|---|---|

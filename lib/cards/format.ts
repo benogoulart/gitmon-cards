@@ -55,6 +55,15 @@ export function year(iso: string): number {
 export const FOOTER_CHARS = 36;
 
 /**
+ * Orçamento do nome no cabeçalho da carta.
+ *
+ * `nameSize` em `lib/og/renderCard.tsx` encolhe o corpo em três degraus e para
+ * em 19px; daí para frente, `layout.name.maxWidth` corta a seco. 26 é onde o
+ * último degrau ainda cabe nos 280px.
+ */
+export const CARD_NAME_CHARS = 26;
+
+/**
  * Trunca sem cortar palavra no meio quando dá, e usa reticências de um caractere
  * só (não três pontos) para não roubar espaço na linha.
  */

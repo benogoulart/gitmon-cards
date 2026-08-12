@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { renderCard } from "@/lib/og/renderCard";
+import { renderCardOg } from "@/lib/og/renderCardOg";
 import { ELEMENTS, RARITIES, type Card } from "@/lib/cards/types";
 
 /**
@@ -39,8 +40,13 @@ const BASE: Card = {
   sourceUrl: "https://github.com/torvalds",
 };
 
-async function toPng(card: Card, locale: "pt" | "en", filename: string): Promise<Buffer> {
-  const image = await renderCard(card, locale);
+async function toPng(
+  card: Card,
+  locale: "pt" | "en",
+  filename: string,
+  render = renderCard,
+): Promise<Buffer> {
+  const image = await render(card, locale);
   const buffer = Buffer.from(await image.arrayBuffer());
 
   if (PREVIEW) {
@@ -174,6 +180,35 @@ describe("renderCard", () => {
       },
       "pt",
       "rodape-longo.png",
+    );
+    expect(isPng(png)).toBe(true);
+  }, 60_000);
+
+  /*
+   * A prévia de link. Renderiza a carta por dentro, então cobre os dois passes
+   * de Satori de uma vez — e o `PREVIEW` grava o 1200×630 para a verificação que
+   * importa: a carta tem que caber inteira, sem o corte de cabeçalho e rodapé
+   * que o `/<id>.png` retrato levava nas prévias.
+   */
+  it("compõe a prévia de link em paisagem", async () => {
+    const png = await toPng(BASE, "en", "og-profile.png", renderCardOg);
+    expect(isPng(png)).toBe(true);
+  }, 60_000);
+
+  it("acomoda nome longo e carta sem serial na prévia", async () => {
+    const png = await toPng(
+      {
+        ...BASE,
+        kind: "repo",
+        name: "uma-organizacao-de-nome-longo",
+        element: "poison",
+        rarity: "double_rare",
+        serial: null,
+        footer: "Descrição curta… · owner · 2019",
+      },
+      "pt",
+      "og-repo.png",
+      renderCardOg,
     );
     expect(isPng(png)).toBe(true);
   }, 60_000);
