@@ -150,7 +150,15 @@ export async function renderCard(card: Card, locale: Locale): Promise<ImageRespo
           {card.name}
         </div>
 
-        {/* HP, vermelho e alinhado à direita (RFC 4.4, item 4) */}
+        {/*
+          HP, vermelho e alinhado à direita (RFC 4.4, item 4).
+
+          É o herói numérico da carta: na régua Wrapped/Skyline o que faz a peça
+          ler em um segundo é um número grande, e a 34 contra 30 do nome os dois
+          competiam sem que nenhum vencesse. O rótulo desce a acompanhante —
+          corpo menor, alinhado pela base do número em vez de pelo centro da
+          caixa, que é onde ele flutuava.
+        */}
         <div
           style={{
             position: "absolute",
@@ -158,16 +166,31 @@ export async function renderCard(card: Card, locale: Locale): Promise<ImageRespo
             top: layout.hp.top,
             height: layout.hp.boxHeight,
             display: "flex",
-            alignItems: "center",
-            gap: 4,
+            alignItems: "flex-end",
+            gap: 5,
             // O vermelho de contraste com face clara some sobre o scrim.
             color: treatment.fullArt ? HP_RED_ON_ART : HP_RED,
           }}
         >
-          <span style={{ fontSize: layout.hp.labelSize, fontWeight: 700, paddingTop: 8 }}>
+          <span
+            style={{
+              fontSize: layout.hp.labelSize,
+              fontWeight: 700,
+              opacity: 0.8,
+              letterSpacing: 0.5,
+              paddingBottom: 9,
+            }}
+          >
             {t("card.hp")}
           </span>
-          <span style={{ fontSize: layout.hp.size, fontWeight: 900, letterSpacing: -1 }}>
+          <span
+            style={{
+              fontSize: layout.hp.size,
+              fontWeight: 900,
+              letterSpacing: -2,
+              lineHeight: 1,
+            }}
+          >
             {card.hp}
           </span>
         </div>

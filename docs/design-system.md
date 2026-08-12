@@ -130,6 +130,12 @@ A luz do PNG é `feDistantLight` (azimute `250`, elevação `52`), não pontual:
 
 Tudo é alpha, nenhum pixel opaco e nenhum preto: o Satori não tem `mix-blend-mode` e qualquer área escura viraria véu cinza. O foil é o único asset gravado como PNG indexado (256 cores): ruído de baixo contraste cabe em 230 KB em vez de 780 KB sem diferença visível, e nas molduras a mesma quantização faria faixas nos gradientes largos.
 
+## Cabeçalho da carta
+
+**O HP ganha do nome.** `46px` peso 900 contra `28px` — antes eram `34` contra `30`, e nessa distância os dois competiam sem que nenhum vencesse: a carta não tinha ponto de entrada num thumbnail de feed. Na régua Wrapped/Skyline o que faz a peça ler em um segundo é um número grande.
+
+O rótulo `HP`/`PS` é acompanhante: `14px`, opacidade `0.8`, alinhado pela **base** do número e não pelo centro da caixa, que é onde ele flutuava. O nome recuou `maxWidth` para `280px` — a `46px`, `250` mais o rótulo começam em `x=355`, e `300` de nome chegariam a `348`. A escada de `nameSize` acompanha o corpo base, então nomes longos encolhem na mesma proporção de antes.
+
 ## Rodapé e número de série
 
 Duas colunas: texto à esquerda em `284px`, selo à direita em `108px`. O selo é sempre o mesmo bloco — mesma largura, mesma altura, mesmo centro — e o que muda é quem manda dentro dele.

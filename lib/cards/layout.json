@@ -17,8 +17,9 @@
     "scrimHeight": 118
   },
 
-  "name": { "x": 48, "top": 32, "boxHeight": 46, "size": 30, "maxWidth": 300 },
-  "hp": { "right": 40, "top": 30, "boxHeight": 48, "size": 34, "labelSize": 15 },
+  "_headerComment": "O HP ganha do nome de propósito. A 34 contra 30 os dois competiam e nenhum vencia, e num thumbnail de feed a carta não tinha ponto de entrada. `maxWidth` do nome recuou para 280 para abrir o espaço que o número passou a ocupar: a 46px, `250` mais o rótulo começam em x=355, e 300 de largura de nome chegariam a 348.",
+  "name": { "x": 48, "top": 34, "boxHeight": 46, "size": 28, "maxWidth": 280 },
+  "hp": { "right": 40, "top": 26, "boxHeight": 56, "size": 46, "labelSize": 14 },
 
   "typeStrip": { "x": 55, "y": 408, "width": 390, "height": 34, "size": 15 },
 
