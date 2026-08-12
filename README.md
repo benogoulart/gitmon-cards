@@ -181,6 +181,8 @@ Os símbolos de raridade (`● ◆ ★`) não são assets: são glifos cobertos 
 | [`docs/assets-brief.md`](docs/assets-brief.md) | Briefing da arte original (molduras, energia, raridade) |
 | [`docs/foil-especular.md`](docs/foil-especular.md) | O efeito de foil ao vivo, e por que ele é camada sobre o PNG |
 | [`docs/gaps-revalidacao.md`](docs/gaps-revalidacao.md) | Placar de pendências conhecidas, com justificativa |
+| [`docs/revamp-visual.md`](docs/revamp-visual.md) | Plano do revamp visual de carta e site — direção travada, nada implementado |
+| [`PRODUCT.md`](PRODUCT.md) | Verdade de produto durável: usuários, posicionamento, restrições e compromissos de marca |
 | [`docs/handoff.md`](docs/handoff.md) | Estado do trabalho em andamento e o contexto que não está no código |
 
 A RFC é a fonte de verdade declarada. Onde uma decisão posterior a substituiu, a seção original

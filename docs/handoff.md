@@ -7,18 +7,32 @@ itens.
 
 ## Onde está
 
-Branch `feat/tipos-18-raridade-e-status`, três commits, ainda sem PR — o autor
-abre quando as pendências fecharem.
+Duas branches, duas PRs empilhadas, ambas abertas.
 
-| Commit | Escopo |
-|---|---|
-| `a2996dc` | 18 tipos, escada de raridade do TCG, serial, tratamentos de arte, painel de explicação, abertura de pacote, faixa de apoio |
-| `7e2516d` | Radar de assinatura do perfil |
-| `9d79276` | Arranjo simétrico da página da carta |
-| (a seguir) | Derivações da carta de repositório, ícones de tipo na interface, RFCs conciliadas com os 18 tipos |
+| PR | Branch | Base | Escopo |
+|---|---|---|---|
+| [#1](https://github.com/mcsscalabrin/gitmon-cards/pull/1) | `feat/tipos-18-raridade-e-status` | `main` | 18 tipos, raridade, serial, radar, derivações, ícones de tipo, docs conciliadas — 9 commits |
+| [#2](https://github.com/mcsscalabrin/gitmon-cards/pull/2) | `feat/carta-holografica` | `feat/tipos-18-raridade-e-status` | Foil holográfico por camadas e o fix do tilt 3D — 2 commits |
 
-Verificado no último commit: **103 testes unitários, 13 e2e, typecheck e build
-limpos**.
+A #2 é empilhada de propósito, para os dois assuntos serem revisáveis em
+separado. Quando a #1 entrar na `main`, o GitHub reaponta a #2 sozinho.
+
+Verificado no último commit: **106 testes unitários, 13 e2e, typecheck limpo**.
+
+### O bug que vale conhecer antes de mexer em animação
+
+O tilt 3D **nunca funcionou** desde que foi escrito, e o motivo não aparece em
+teste nenhum: `.tilt-card` declarava `animation: reveal ... both`, e com
+`fill-mode: both` o quadro 100% da animação (`transform: none`) continua valendo
+depois que ela termina. No CSS, animação vence declaração normal na cascata — o
+`transform` com as custom properties do tilt nunca chegava a ser aplicado.
+
+O componente calculava os ângulos certos, escrevia as variáveis certas, o
+`data-active` entrava no DOM, e a carta não se mexia. Medido no navegador:
+`--tilt-x: 4.8deg` com `transform: matrix(1, 0, 0, 1, 0, 0)`.
+
+A lição generalizável: **`fill-mode: both` numa regra que também declara
+`transform` congela esse transform para sempre.** Use `backwards`.
 
 `.claude/` está **deliberadamente fora dos commits** — contém só o skill file do
 Superdesign, que é ferramenta e não produto. Decidir se versiona é do autor.
@@ -47,6 +61,28 @@ correção.
    (RFC 9.6), e é por isso que `derivations` e `ratings` são opcionais no
    domínio — o renderizador nunca os lê.
 
+## Revamp visual — direção resolvida, nada implementado
+
+O plano completo está em [`revamp-visual.md`](./revamp-visual.md); o contexto de
+produto, em [`PRODUCT.md`](../PRODUCT.md). As decisões viraram D13–D17 em
+[`decisions.md`](./decisions.md). **Nenhuma linha de código foi escrita** — a
+sessão parou de propósito antes da implementação.
+
+O que outra sessão precisa saber para começar sem refazer o caminho:
+
+1. **A ordem não é arbitrária.** A carta exportada vem antes do site porque o
+   destino principal virou o feed (D13), e no feed o PNG é o produto inteiro. Hoje
+   o foil que viaja é o `foil-<rarity>.png` estático, que é a parte mais fraca do
+   produto — enquanto o foil bom vive só no site e nunca sai de lá.
+2. **A fase 1.1 (reassar o foil por tier) é a de maior retorno e a mais isolada:**
+   mexe em `scripts/build-assets.mjs` e em nada mais.
+3. **Nenhuma das cinco mudanças de carta altera o formato do dado**, então
+   nenhuma exige subir `CARD_VERSION`. Confira antes de assumir o contrário.
+4. **A direção foi escolhida sem comps.** A sessão não tinha ferramenta de geração
+   de imagem, então a página de decisão levou paleta e fatos. Se a execução
+   parecer errada, a hipótese mais provável não é o plano — é que o autor
+   escolheu sem ver.
+
 ## Superdesign
 
 Projeto: `ed05a819-e5d0-41e7-ad22-2a5f91db6205`
@@ -70,9 +106,11 @@ Créditos gastos: ~60,5.
 
 ## Bloqueado no autor
 
-1. **Olhar o foil ao vivo** em `/torvalds`. Terceira tentativa no efeito, duas
-   reprovadas. Está no DOM no tier certo e ausente no errado, mas ninguém julgou
-   o resultado visual.
+1. **Olhar o foil ao vivo** em `/torvalds` e `/facebook/react`. O efeito foi
+   reconstruído em quatro camadas (relevo especular, espectro, sheen, granulado)
+   e o tilt 3D voltou a funcionar, mas **ninguém julgou o resultado visual** — as
+   duas reprovações anteriores foram do autor olhando, e essa etapa não aconteceu
+   nesta versão. Conferido só por screenshot pelo assistente.
 2. **Subir o Docker Desktop.** Com ele de pé, levantar um Redis e exercitar a
    atomicidade do script Lua — é o único caminho de código que iria para
    produção sem nunca ter rodado. A lógica em volta tem 15 testes com o cliente
