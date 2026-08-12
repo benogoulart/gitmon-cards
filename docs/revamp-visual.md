@@ -50,10 +50,28 @@ Sem ironia, sem reinterpretação autoral da moldura, sem quirk contrabandeado.
 
 ---
 
-## Fase 1 — a carta exportada
+## Fase 1 — a carta exportada — **FEITA**
 
 Maior retorno: é o que viaja. Tudo aqui é `lib/cards/layout.json`,
 `lib/og/renderCard.tsx` e `scripts/build-assets.mjs`.
+
+Os cinco itens estão implementados, em cinco commits. O registro do sistema
+**como ficou** está em [`design-system.md`](design-system.md), que é onde ele
+deve ser lido; o que segue abaixo é o plano como foi escrito, mantido porque as
+razões continuam valendo. Três coisas só apareceram construindo, e nenhuma
+estava prevista aqui:
+
+1. **O foil enterrava a arte.** O risco estava previsto na tabela de riscos, mas
+   como questão de calibração. Não é: em qualquer força que leia como foil, um
+   retrato por baixo é apagado. A saída foi separar as camadas que somam luz
+   branca (relevo, granulado — recuam a 26% na janela) das que somam cor
+   (espectro, lâmina — atravessam inteiras).
+2. **A vertical do layout já estava no limite.** "Subir o piso de arte" não era
+   uma folga esperando ser usada; exigiu recalcular o empilhamento inteiro.
+3. **`rare` e `double_rare` eram a mesma carta**, e `hyper_rare` contra `rare` já
+   lia depois da fase 1.1. O alvo declarado da 1.3 estava cumprido antes de ela
+   começar, e o problema real era outro — só visível renderizando os oito tiers
+   lado a lado a 150px.
 
 ### 1.1 Reassar o foil por tier
 

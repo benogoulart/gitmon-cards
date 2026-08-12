@@ -61,27 +61,40 @@ correção.
    (RFC 9.6), e é por isso que `derivations` e `ratings` são opcionais no
    domínio — o renderizador nunca os lê.
 
-## Revamp visual — direção resolvida, nada implementado
+## Revamp visual — fase 1 feita, fases 2 e 3 não
 
 O plano completo está em [`revamp-visual.md`](./revamp-visual.md); o contexto de
-produto, em [`PRODUCT.md`](../PRODUCT.md). As decisões viraram D13–D17 em
-[`decisions.md`](./decisions.md). **Nenhuma linha de código foi escrita** — a
-sessão parou de propósito antes da implementação.
+produto, em [`PRODUCT.md`](../PRODUCT.md); as decisões, em D13–D17 de
+[`decisions.md`](./decisions.md). O sistema **como ficou** está em
+[`design-system.md`](./design-system.md) — é de lá que se deve ler, não do plano.
 
-O que outra sessão precisa saber para começar sem refazer o caminho:
+A **fase 1 (a carta exportada) está implementada**, em cinco commits, um por
+item: foil reassado em quatro camadas · serial como elemento de design · mais
+arte e a solda · HP como herói · raridade em superfície e borda. 114 testes
+unitários, 13 e2e, typecheck limpo.
 
-1. **A ordem não é arbitrária.** A carta exportada vem antes do site porque o
-   destino principal virou o feed (D13), e no feed o PNG é o produto inteiro. Hoje
-   o foil que viaja é o `foil-<rarity>.png` estático, que é a parte mais fraca do
-   produto — enquanto o foil bom vive só no site e nunca sai de lá.
-2. **A fase 1.1 (reassar o foil por tier) é a de maior retorno e a mais isolada:**
-   mexe em `scripts/build-assets.mjs` e em nada mais.
-3. **Nenhuma das cinco mudanças de carta altera o formato do dado**, então
-   nenhuma exige subir `CARD_VERSION`. Confira antes de assumir o contrário.
-4. **A direção foi escolhida sem comps.** A sessão não tinha ferramenta de geração
-   de imagem, então a página de decisão levou paleta e fatos. Se a execução
-   parecer errada, a hipótese mais provável não é o plano — é que o autor
-   escolheu sem ver.
+**As fases 2 (compartilhamento) e 3 (site) não foram tocadas.** A fase 2 é OG na
+página da carta, baixar PNG e Web Share — e o plano registra que OG é o primeiro
+candidato a corte se a frente precisar ficar estreita. A fase 3 é a webfont da
+carta no site e a cor de elemento no resto da página.
+
+O que outra sessão precisa saber:
+
+1. **A direção foi escolhida sem comps.** A sessão de planejamento não tinha
+   ferramenta de geração de imagem, então a página de decisão levou paleta e
+   fatos. Se a execução parecer errada, a hipótese mais provável não é o plano —
+   é que o autor escolheu sem ver.
+2. **Nenhuma mudança da fase 1 alterou o formato do dado**, então `CARD_VERSION`
+   não subiu. Mas o **cache do navegador** mascara tudo isso: a rota de imagem
+   responde `max-age=3600` e o PNG na tela pode ser de uma hora atrás. Ver a
+   seção de caches mais abaixo.
+3. **`lib/cards/foil.json` é fonte única da escada do foil**, lida pelo runtime
+   (`foilIntensity`) e pela build (`foilSvg`). Antes eram duas escadas paralelas
+   com números diferentes.
+4. **O que muda por raridade nunca multiplica pelos 18 tipos** (RFC 8, caminho
+   C). Foil, metal e borda são camadas sem elemento. A única exceção é o foil,
+   que tem duas variantes — padrão e full-art — porque recua sobre a janela da
+   arte, e a janela do full-art é outra.
 
 ## Superdesign
 
@@ -106,11 +119,20 @@ Créditos gastos: ~60,5.
 
 ## Bloqueado no autor
 
-1. **Olhar o foil ao vivo** em `/torvalds` e `/facebook/react`. O efeito foi
-   reconstruído em quatro camadas (relevo especular, espectro, sheen, granulado)
-   e o tilt 3D voltou a funcionar, mas **ninguém julgou o resultado visual** — as
-   duas reprovações anteriores foram do autor olhando, e essa etapa não aconteceu
-   nesta versão. Conferido só por screenshot pelo assistente.
+1. **Olhar a carta** em `/torvalds` e `/facebook/react` — agora as duas coisas,
+   o foil ao vivo e a carta exportada, que mudou inteira na fase 1 do revamp.
+   Nenhuma das duas foi julgada por pessoa: as duas reprovações anteriores do
+   foil foram do autor olhando, e nem essa etapa nem a da carta nova
+   aconteceram. Conferido só por PNG renderizado pelo assistente.
+
+   Vale olhar **reduzida**, não só no monitor inteiro: o alvo declarado é a
+   carta ler em um segundo num thumbnail de feed, e é lá que a escada de
+   raridade se prova. Para ver os oito tiers de uma vez,
+   `$env:PREVIEW="out"; npx vitest run tests/unit/render-card.test.ts` grava um
+   `tier-<rarity>.png` por tier.
+
+   E force o cache: a rota de imagem responde `max-age=3600`, então o PNG na tela
+   pode ser anterior a tudo isto. `?bust=<agora>` resolve.
 2. **Subir o Docker Desktop.** Com ele de pé, levantar um Redis e exercitar a
    atomicidade do script Lua — é o único caminho de código que iria para
    produção sem nunca ter rodado. A lógica em volta tem 15 testes com o cliente
